@@ -1,0 +1,25 @@
+{
+  "name": "tzientist",
+  "version": "0.1.0",
+  "description": "Scientist-like library in TypeScript",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TrueWill/tzientist.git"
+  },
+  "author": "William E. Sorensen",
+  "license": "MIT",
+  "keywords": [
+    "scientist",
+    "refactoring",
+    "typescript",
+    "nodejs"
+  ],
+  "bugs": {
+    "url": "https://github.com/TrueWill/tzientist/issues"
+  },
+  "homepage": "https://github.com/TrueWill/tzientist#tzientist"
+}
