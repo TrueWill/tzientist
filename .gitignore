@@ -13,9 +13,6 @@ logs
 results
 tmp
 
-# Build
-public/css/main.css
-
 # Coverage reports
 coverage
 
@@ -24,7 +21,6 @@ coverage
 
 # Dependency directory
 node_modules
-bower_components
 
 # Editors
 .idea
@@ -35,7 +31,7 @@ bower_components
 Thumbs.db
 
 # Ignore built ts files
-dist/**/*
+lib/**/*
 
 # ignore yarn.lock
 yarn.lock
