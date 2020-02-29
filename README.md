@@ -1,6 +1,6 @@
 # Tzientist
 
-A Scientist-like library implemented in TypeScript.
+A Scientist-like library for Node.js, implemented in TypeScript.
 
 It permits comparing legacy and refactored code paths in production environments,
 verifying both functional and non-functional requirements.
@@ -26,6 +26,7 @@ Feature parity with Scientist is _not_ a goal.
 ### Technology stack
 
 - TypeScript v3.8
+- Node v12
 - npm v6 (I like yarn, but not everyone does)
 - [Prettier](https://prettier.io/)
 - ESLint
