@@ -6,21 +6,21 @@ export type ExperimentFunction<TParams extends any[], TResult> = (
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function experiment<TParams extends any[], TResult>({
   name,
-  control: use,
-  pilot: check
+  control,
+  candidate
 }: {
   name: string;
   control: ExperimentFunction<TParams, TResult>;
-  pilot: ExperimentFunction<TParams, TResult>;
+  candidate: ExperimentFunction<TParams, TResult>;
 }): ExperimentFunction<TParams, TResult> {
   return (...args): TResult => {
-    const checkResult = check(...args);
-    const useResult = use(...args);
+    const candidateResult = candidate(...args);
+    const controlResult = control(...args);
 
-    if (useResult !== checkResult) {
+    if (controlResult !== candidateResult) {
       console.log(`Experiment ${name}: difference found`);
     }
 
-    return useResult;
+    return controlResult;
   };
 }

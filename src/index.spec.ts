@@ -14,7 +14,7 @@ describe('Experiment', () => {
       const experiment = scientist.experiment({
         name: 'equivalent1',
         control: sum,
-        pilot: sum2
+        candidate: sum2
       });
 
       const result: number = experiment(1, 2);
@@ -28,7 +28,7 @@ describe('Experiment', () => {
       return `Ctrl+${s}`;
     }
 
-    function other(s: string): string {
+    function candi(s: string): string {
       return s;
     }
 
@@ -36,7 +36,7 @@ describe('Experiment', () => {
       const experiment = scientist.experiment({
         name: 'differ1',
         control: ctrl,
-        pilot: other
+        candidate: candi
       });
 
       const result: string = experiment('C');
