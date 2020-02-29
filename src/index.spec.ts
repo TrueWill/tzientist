@@ -1,23 +1,47 @@
 import * as scientist from './index';
 
-function sum(a: number, b: number): number {
-  return a + b;
-}
-
-function sum2(a: number, b: number): number {
-  return b + a;
-}
-
 describe('Experiment', () => {
-  it('should be identical when functions are equivalent', () => {
-    const experiment = scientist.experiment({
-      name: 'test',
-      use: sum,
-      check: sum2
+  describe('when functions are equivalent', () => {
+    function sum(a: number, b: number): number {
+      return a + b;
+    }
+
+    function sum2(a: number, b: number): number {
+      return b + a;
+    }
+
+    it('should return result', () => {
+      const experiment = scientist.experiment({
+        name: 'equivalent1',
+        control: sum,
+        pilot: sum2
+      });
+
+      const result: number = experiment(1, 2);
+
+      expect(result).toBe(3);
     });
+  });
 
-    const result: number = experiment(1, 2);
+  describe('when function results differ', () => {
+    function ctrl(s: string): string {
+      return `Ctrl+${s}`;
+    }
 
-    expect(result).toBe(3);
+    function other(s: string): string {
+      return s;
+    }
+
+    it('should return result of control', () => {
+      const experiment = scientist.experiment({
+        name: 'differ1',
+        control: ctrl,
+        pilot: other
+      });
+
+      const result: string = experiment('C');
+
+      expect(result).toBe('Ctrl+C');
+    });
   });
 });

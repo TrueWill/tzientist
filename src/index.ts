@@ -6,12 +6,12 @@ export type ExperimentFunction<TParams extends any[], TResult> = (
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function experiment<TParams extends any[], TResult>({
   name,
-  use,
-  check
+  control: use,
+  pilot: check
 }: {
   name: string;
-  use: ExperimentFunction<TParams, TResult>;
-  check: ExperimentFunction<TParams, TResult>;
+  control: ExperimentFunction<TParams, TResult>;
+  pilot: ExperimentFunction<TParams, TResult>;
 }): ExperimentFunction<TParams, TResult> {
   return (...args): TResult => {
     const checkResult = check(...args);
