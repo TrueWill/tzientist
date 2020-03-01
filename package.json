@@ -1,7 +1,7 @@
 {
   "name": "tzientist",
   "version": "0.1.0",
-  "description": "Scientist-like library in TypeScript",
+  "description": "Scientist-like library for Node.js in TypeScript",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
