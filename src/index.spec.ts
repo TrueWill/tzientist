@@ -43,5 +43,26 @@ describe('Experiment', () => {
 
       expect(result).toBe('Ctrl+C');
     });
+
+    it('should publish result', () => {
+      const publishMock = jest.fn<void, [scientist.Result<string>]>();
+
+      const experiment = scientist.experiment({
+        name: 'differ1',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      experiment('C');
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const result = publishMock.mock.calls[0][0];
+      expect(result.experimentName).toBe('differ1');
+      expect(result.controlResult).toBe('Ctrl+C');
+      expect(result.candidateResult).toBe('C');
+    });
   });
 });
