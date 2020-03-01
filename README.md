@@ -14,6 +14,27 @@ or
 
 `yarn add tzientist`
 
+## Getting started
+
+```TypeScript
+import * as scientist from 'tzientist';
+
+const experiment = scientist.experiment({
+  name: 'trial1',
+  control: (s: string) => 'Control ' + s,
+  candidate: (s: string) => 'not quite right ' + s
+});
+
+console.log(experiment('C'));
+```
+
+This uses the default options and prints:
+
+```
+Experiment trial1: difference found
+Control C
+```
+
 ## Why
 
 GitHub's [Scientist](https://github.com/github/scientist) Ruby library is a brilliant concept. Unfortunately the Node.js alternatives aren't very TypeScript-friendly.
