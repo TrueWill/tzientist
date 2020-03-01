@@ -6,6 +6,14 @@ It permits comparing legacy and refactored code paths in production environments
 verifying both functional and non-functional requirements.
 This is also known as the Parallel Run pattern.
 
+## Installation
+
+`npm i tzientist`
+
+or
+
+`yarn add tzientist`
+
 ## Why
 
 GitHub's [Scientist](https://github.com/github/scientist) Ruby library is a brilliant concept. Unfortunately the Node.js alternatives aren't very TypeScript-friendly.
