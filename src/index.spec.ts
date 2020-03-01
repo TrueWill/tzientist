@@ -55,7 +55,7 @@ describe('Experiment', () => {
 
     it('should publish result', () => {
       const experiment = scientist.experiment({
-        name: 'differ1',
+        name: 'differ2',
         control: ctrl,
         candidate: candi,
         options: {
@@ -67,9 +67,62 @@ describe('Experiment', () => {
 
       expect(publishMock.mock.calls.length).toBe(1);
       const result = publishMock.mock.calls[0][0];
-      expect(result.experimentName).toBe('differ1');
+      expect(result.experimentName).toBe('differ2');
       expect(result.controlResult).toBe('Ctrl+C');
       expect(result.candidateResult).toBe('C');
+      expect(result.candidateError).toBeUndefined();
+    });
+  });
+
+  describe('when candidate throws', () => {
+    function ctrl(): string {
+      return 'Everything is under control';
+    }
+
+    function candi(): string {
+      throw new Error("Candy I can't let you go");
+    }
+
+    let publishMock: jest.Mock<void, [scientist.Result<string>]>;
+
+    beforeEach(() => {
+      publishMock = jest.fn<void, [scientist.Result<string>]>();
+    });
+
+    it('should return result of control', () => {
+      const experiment = scientist.experiment({
+        name: 'throw1',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      const result: string = experiment();
+
+      expect(result).toBe('Everything is under control');
+    });
+
+    it('should publish result', () => {
+      const experiment = scientist.experiment({
+        name: 'throw2',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      experiment();
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const result = publishMock.mock.calls[0][0];
+      expect(result.experimentName).toBe('throw2');
+      expect(result.controlResult).toBe('Everything is under control');
+      expect(result.candidateResult).toBeUndefined();
+      expect(result.candidateError).toBeDefined();
+      expect(result.candidateError.message).toBe("Candy I can't let you go");
     });
   });
 });

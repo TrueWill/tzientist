@@ -6,7 +6,9 @@ export type ExperimentFunction<TParams extends any[], TResult> = (
 export interface Result<TResult> {
   experimentName: string;
   controlResult: TResult;
-  candidateResult: TResult;
+  candidateResult?: TResult;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  candidateError?: any;
 }
 
 export interface Options<TResult> {
@@ -34,15 +36,33 @@ export function experiment<TParams extends any[], TResult>({
   }
 
   return (...args): TResult => {
-    const candidateResult = candidate(...args);
+    let candidateResult: TResult | undefined;
+    let hasCandidateResult = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let candidateError: any;
+
+    try {
+      candidateResult = candidate(...args);
+      hasCandidateResult = true;
+    } catch (e) {
+      candidateError = e;
+    }
+
     const controlResult = control(...args);
 
-    if (controlResult !== candidateResult) {
+    if (hasCandidateResult && controlResult !== candidateResult) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       options!.publish({
         experimentName: name,
         controlResult,
         candidateResult
+      });
+    } else if (!hasCandidateResult) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      options!.publish({
+        experimentName: name,
+        controlResult,
+        candidateError
       });
     }
 
