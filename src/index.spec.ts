@@ -32,11 +32,20 @@ describe('Experiment', () => {
       return s;
     }
 
+    let publishMock: jest.Mock<void, [scientist.Result<string>]>;
+
+    beforeEach(() => {
+      publishMock = jest.fn<void, [scientist.Result<string>]>();
+    });
+
     it('should return result of control', () => {
       const experiment = scientist.experiment({
         name: 'differ1',
         control: ctrl,
-        candidate: candi
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
       });
 
       const result: string = experiment('C');
@@ -45,8 +54,6 @@ describe('Experiment', () => {
     });
 
     it('should publish result', () => {
-      const publishMock = jest.fn<void, [scientist.Result<string>]>();
-
       const experiment = scientist.experiment({
         name: 'differ1',
         control: ctrl,
