@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ExperimentFunction<TParams extends any[], TResult> = (
   ...args: TParams
 ) => TResult;
@@ -7,7 +6,6 @@ export interface Result<TResult> {
   experimentName: string;
   controlResult: TResult;
   candidateResult?: TResult;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   candidateError?: any;
 }
 
@@ -15,7 +13,6 @@ export interface Options<TResult> {
   publish: (result: Result<TResult>) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function experiment<TParams extends any[], TResult>({
   name,
   control,
@@ -38,7 +35,6 @@ export function experiment<TParams extends any[], TResult>({
   return (...args): TResult => {
     let candidateResult: TResult | undefined;
     let hasCandidateResult = false;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let candidateError: any;
 
     try {
