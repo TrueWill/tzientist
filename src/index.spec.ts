@@ -1,9 +1,9 @@
 import * as scientist from './index';
 
 describe('Experiment', () => {
-  const publishMock: jest.Mock<void, [scientist.Result<string>]> = jest.fn<
+  const publishMock: jest.Mock<void, [scientist.Result<any>]> = jest.fn<
     void,
-    [scientist.Result<string>]
+    [scientist.Result<any>]
   >();
 
   afterEach(() => {
@@ -29,6 +29,26 @@ describe('Experiment', () => {
       const result: number = experiment(1, 2);
 
       expect(result).toBe(3);
+    });
+
+    it('should publish result', () => {
+      const experiment = scientist.experiment({
+        name: 'equivalent2',
+        control: sum,
+        candidate: sum2,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      experiment(1, 2);
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const result = publishMock.mock.calls[0][0];
+      expect(result.experimentName).toBe('equivalent2');
+      expect(result.controlResult).toBe(3);
+      expect(result.candidateResult).toBe(3);
+      expect(result.candidateError).toBeUndefined();
     });
   });
 

@@ -27,7 +27,8 @@ export function experiment<TParams extends any[], TResult>({
   if (!options) {
     options = {
       publish: (result): void => {
-        console.log(`Experiment ${result.experimentName}: difference found`);
+        if (result.controlResult !== result.candidateResult)
+          console.log(`Experiment ${result.experimentName}: difference found`);
       }
     };
   }
@@ -46,7 +47,7 @@ export function experiment<TParams extends any[], TResult>({
 
     const controlResult = control(...args);
 
-    if (hasCandidateResult && controlResult !== candidateResult) {
+    if (hasCandidateResult) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       options!.publish({
         experimentName: name,
