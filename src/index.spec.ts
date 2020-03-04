@@ -1,6 +1,15 @@
 import * as scientist from './index';
 
 describe('Experiment', () => {
+  const publishMock: jest.Mock<void, [scientist.Result<string>]> = jest.fn<
+    void,
+    [scientist.Result<string>]
+  >();
+
+  afterEach(() => {
+    publishMock.mockClear();
+  });
+
   describe('when functions are equivalent', () => {
     function sum(a: number, b: number): number {
       return a + b;
@@ -31,12 +40,6 @@ describe('Experiment', () => {
     function candi(s: string): string {
       return s;
     }
-
-    let publishMock: jest.Mock<void, [scientist.Result<string>]>;
-
-    beforeEach(() => {
-      publishMock = jest.fn<void, [scientist.Result<string>]>();
-    });
 
     it('should return result of control', () => {
       const experiment = scientist.experiment({
@@ -82,12 +85,6 @@ describe('Experiment', () => {
     function candi(): string {
       throw new Error("Candy I can't let you go");
     }
-
-    let publishMock: jest.Mock<void, [scientist.Result<string>]>;
-
-    beforeEach(() => {
-      publishMock = jest.fn<void, [scientist.Result<string>]>();
-    });
 
     it('should return result of control', () => {
       const experiment = scientist.experiment({
