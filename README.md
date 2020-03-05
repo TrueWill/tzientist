@@ -47,6 +47,7 @@ Similarly, you don't need clean or ignore options.
 ## To do
 
 - If the control throws it would be good to catch and re-throw that. Otherwise you don't know if behavior differs.
+- Timer support.
 - Async support.
 
 ## Why
@@ -82,6 +83,7 @@ Feature parity with Scientist is _not_ a goal.
 - Prettier with single quotes
 - No ESLint warnings/errors
 - All tests pass
+- No dependencies (other than devDependencies)
 
 **Note**: I use Mac OS, which uses Unix style (LF) line breaks. I haven't added a .gitattributes file yet.
 
