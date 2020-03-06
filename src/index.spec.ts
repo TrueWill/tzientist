@@ -142,4 +142,54 @@ describe('Experiment', () => {
       expect(result.candidateError.message).toBe("Candy I can't let you go");
     });
   });
+
+  describe('when control throws', () => {
+    function ctrl(): string {
+      throw new Error('Kaos!');
+    }
+
+    function candi(): string {
+      return 'Kane';
+    }
+
+    it('should throw', () => {
+      const experiment = scientist.experiment({
+        name: 'cthrow1',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      expect(() => experiment()).toThrowError('Kaos!');
+    });
+
+    it('should publish result', () => {
+      const experiment = scientist.experiment({
+        name: 'cthrow2',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      try {
+        experiment();
+      } catch {
+        // swallow error
+      }
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const result = publishMock.mock.calls[0][0];
+      expect(result.experimentName).toBe('cthrow2');
+      expect(result.controlResult).toBeUndefined();
+      expect(result.candidateResult).toBe('Kane');
+      expect(result.candidateError).toBeUndefined();
+
+      expect(result.controlError).toBeDefined();
+      expect(result.controlError.message).toBe('Kaos!');
+    });
+  });
 });

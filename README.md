@@ -42,11 +42,14 @@ Control C
 I realized that if you **always** publish results, you don't need a comparison option.
 The `publish` function can do (or delegate) that.
 Similarly, you don't need clean or ignore options.
-`publish` should be fast, though.
+`publish` should be fast, though. (Also it should **not** throw.)
 
 ## To do
 
-- If the control throws it would be good to catch and re-throw that. Otherwise you don't know if behavior differs.
+- Improve default publish function
+  - Separate function instance
+  - Compare errors
+  - Better message?
 - Timer support.
 - Async support.
 
