@@ -35,7 +35,19 @@ Experiment trial1: difference found
 Control C
 ```
 
+The `control` is the source of truth. It's typically the legacy code you're trying to replace. The `experiment` will always return whatever the `control` returns (or will throw if the `control` throws).
+
+The `candidate` is the new code you're testing that's intended to replace the `control` eventually. The `experiment` runs this code and publishes the result (along with the `control` result). The `experiment` will swallow any errors thrown by the `candidate`.
+
+The `experiment` runs both the `control` and the `candidate`, and it publishes the results to a callback function. Normally you will provide a custom `publish` function in the options that will report the results to some location for later analysis.
+
 ## FAQ
+
+Q. Why would I use this library?
+
+A. You want to refactor or replace existing code, but that code is difficult or impossible to test with automated unit or integration tests. Perhaps it's nondeterministic. It might rely on data or on user input that is only available in a production environment. It could be a combinatorial explosion of states that requires too many test cases. Typically you would use this for high-risk changes, since you'll want to run the experiment for some time in production and check the results.
+
+---
 
 Q. My candidate and control take different parameters. How do I handle that?
 
