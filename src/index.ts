@@ -2,7 +2,7 @@ export type ExperimentFunction<TParams extends any[], TResult> = (
   ...args: TParams
 ) => TResult;
 
-export interface Result<TResult> {
+export interface Results<TResult> {
   experimentName: string;
   controlResult?: TResult;
   candidateResult?: TResult;
@@ -11,16 +11,16 @@ export interface Result<TResult> {
 }
 
 export interface Options<TResult> {
-  publish: (result: Result<TResult>) => void;
+  publish: (results: Results<TResult>) => void;
 }
 
-function defaultPublish<TResult>(result: Result<TResult>): void {
+function defaultPublish<TResult>(results: Results<TResult>): void {
   if (
-    result.candidateResult !== result.controlResult ||
-    (result.candidateError && !result.controlError) ||
-    (!result.candidateError && result.controlError)
+    results.candidateResult !== results.controlResult ||
+    (results.candidateError && !results.controlError) ||
+    (!results.candidateError && results.controlError)
   ) {
-    console.warn(`Experiment ${result.experimentName}: difference found`);
+    console.warn(`Experiment ${results.experimentName}: difference found`);
   }
 }
 

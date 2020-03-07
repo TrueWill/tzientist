@@ -1,9 +1,9 @@
 import * as scientist from './index';
 
 describe('Experiment', () => {
-  const publishMock: jest.Mock<void, [scientist.Result<any>]> = jest.fn<
+  const publishMock: jest.Mock<void, [scientist.Results<any>]> = jest.fn<
     void,
-    [scientist.Result<any>]
+    [scientist.Results<any>]
   >();
 
   afterEach(() => {
@@ -31,7 +31,7 @@ describe('Experiment', () => {
       expect(result).toBe(3);
     });
 
-    it('should publish result', () => {
+    it('should publish results', () => {
       const experiment = scientist.experiment({
         name: 'equivalent2',
         control: sum,
@@ -44,11 +44,11 @@ describe('Experiment', () => {
       experiment(1, 2);
 
       expect(publishMock.mock.calls.length).toBe(1);
-      const result = publishMock.mock.calls[0][0];
-      expect(result.experimentName).toBe('equivalent2');
-      expect(result.controlResult).toBe(3);
-      expect(result.candidateResult).toBe(3);
-      expect(result.candidateError).toBeUndefined();
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('equivalent2');
+      expect(results.controlResult).toBe(3);
+      expect(results.candidateResult).toBe(3);
+      expect(results.candidateError).toBeUndefined();
     });
   });
 
@@ -76,7 +76,7 @@ describe('Experiment', () => {
       expect(result).toBe('Ctrl+C');
     });
 
-    it('should publish result', () => {
+    it('should publish results', () => {
       const experiment = scientist.experiment({
         name: 'differ2',
         control: ctrl,
@@ -89,11 +89,11 @@ describe('Experiment', () => {
       experiment('C');
 
       expect(publishMock.mock.calls.length).toBe(1);
-      const result = publishMock.mock.calls[0][0];
-      expect(result.experimentName).toBe('differ2');
-      expect(result.controlResult).toBe('Ctrl+C');
-      expect(result.candidateResult).toBe('C');
-      expect(result.candidateError).toBeUndefined();
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('differ2');
+      expect(results.controlResult).toBe('Ctrl+C');
+      expect(results.candidateResult).toBe('C');
+      expect(results.candidateError).toBeUndefined();
     });
   });
 
@@ -121,7 +121,7 @@ describe('Experiment', () => {
       expect(result).toBe('Everything is under control');
     });
 
-    it('should publish result', () => {
+    it('should publish results', () => {
       const experiment = scientist.experiment({
         name: 'throw2',
         control: ctrl,
@@ -134,12 +134,12 @@ describe('Experiment', () => {
       experiment();
 
       expect(publishMock.mock.calls.length).toBe(1);
-      const result = publishMock.mock.calls[0][0];
-      expect(result.experimentName).toBe('throw2');
-      expect(result.controlResult).toBe('Everything is under control');
-      expect(result.candidateResult).toBeUndefined();
-      expect(result.candidateError).toBeDefined();
-      expect(result.candidateError.message).toBe("Candy I can't let you go");
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('throw2');
+      expect(results.controlResult).toBe('Everything is under control');
+      expect(results.candidateResult).toBeUndefined();
+      expect(results.candidateError).toBeDefined();
+      expect(results.candidateError.message).toBe("Candy I can't let you go");
     });
   });
 
@@ -165,7 +165,7 @@ describe('Experiment', () => {
       expect(() => experiment()).toThrowError('Kaos!');
     });
 
-    it('should publish result', () => {
+    it('should publish results', () => {
       const experiment = scientist.experiment({
         name: 'cthrow2',
         control: ctrl,
@@ -182,14 +182,14 @@ describe('Experiment', () => {
       }
 
       expect(publishMock.mock.calls.length).toBe(1);
-      const result = publishMock.mock.calls[0][0];
-      expect(result.experimentName).toBe('cthrow2');
-      expect(result.controlResult).toBeUndefined();
-      expect(result.candidateResult).toBe('Kane');
-      expect(result.candidateError).toBeUndefined();
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('cthrow2');
+      expect(results.controlResult).toBeUndefined();
+      expect(results.candidateResult).toBe('Kane');
+      expect(results.candidateError).toBeUndefined();
 
-      expect(result.controlError).toBeDefined();
-      expect(result.controlError.message).toBe('Kaos!');
+      expect(results.controlError).toBeDefined();
+      expect(results.controlError.message).toBe('Kaos!');
     });
   });
 });
