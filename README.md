@@ -35,14 +35,26 @@ Experiment trial1: difference found
 Control C
 ```
 
-## Notes
+## FAQ
 
-**BREAKING CHANGE COMING**
+Q. My candidate and control take different parameters. How do I handle that?
 
-I realized that if you **always** publish results, you don't need a comparison option.
-The `publish` function can do (or delegate) that.
-Similarly, you don't need clean or ignore options.
-`publish` should be fast, though. (Also it should **not** throw.)
+A. Create a facade for one or both so that the parameters match. You don't need to use all of the parameters in both functions.
+
+---
+
+Q. How do I configure custom compare, clean, or ignore functions?
+
+A. Tzientist always publishes results, so you can do all of the above in your `publish` function. `publish` can also delegate to other functions.
+
+---
+
+Q. What are some guidelines for writing `publish` functions?
+
+A.
+
+- `publish` should be fast
+- `publish` should **not** throw (catch any errors)
 
 ## To do
 
