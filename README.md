@@ -46,12 +46,8 @@ Similarly, you don't need clean or ignore options.
 
 ## To do
 
-- Improve default publish function
-  - Separate function instance
-  - Compare errors
-  - Better message?
-- Timer support.
 - Async support.
+- Timer support.
 
 ## Why
 

@@ -14,26 +14,31 @@ export interface Options<TResult> {
   publish: (result: Result<TResult>) => void;
 }
 
+function defaultPublish<TResult>(result: Result<TResult>): void {
+  if (
+    result.candidateResult !== result.controlResult ||
+    (result.candidateError && !result.controlError) ||
+    (!result.candidateError && result.controlError)
+  ) {
+    console.warn(`Experiment ${result.experimentName}: difference found`);
+  }
+}
+
+const defaultOptions = {
+  publish: defaultPublish
+};
+
 export function experiment<TParams extends any[], TResult>({
   name,
   control,
   candidate,
-  options
+  options = defaultOptions
 }: {
   name: string;
   control: ExperimentFunction<TParams, TResult>;
   candidate: ExperimentFunction<TParams, TResult>;
   options?: Options<TResult>;
 }): ExperimentFunction<TParams, TResult> {
-  if (!options) {
-    options = {
-      publish: (result): void => {
-        if (result.controlResult !== result.candidateResult)
-          console.log(`Experiment ${result.experimentName}: difference found`);
-      }
-    };
-  }
-
   return (...args): TResult => {
     let controlResult: TResult | undefined;
     let candidateResult: TResult | undefined;
@@ -53,8 +58,7 @@ export function experiment<TParams extends any[], TResult>({
     } catch (e) {
       controlError = e;
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      options!.publish({
+      options.publish({
         experimentName: name,
         controlResult,
         candidateResult,
@@ -65,15 +69,13 @@ export function experiment<TParams extends any[], TResult>({
     }
 
     if (hasCandidateResult) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      options!.publish({
+      options.publish({
         experimentName: name,
         controlResult,
         candidateResult
       });
     } else if (!hasCandidateResult) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      options!.publish({
+      options.publish({
         experimentName: name,
         controlResult,
         controlError,
