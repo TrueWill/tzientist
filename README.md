@@ -41,6 +41,38 @@ The `candidate` is the new code you're testing that's intended to replace the `c
 
 The `experiment` runs both the `control` and the `candidate`, and it publishes the results to a callback function. Normally you will provide a custom `publish` function in the options that will report the results to some location for later analysis.
 
+### Publishing results
+
+```TypeScript
+function publish(results: scientist.Results<string>): void {
+  if (results.candidateResult !== results.controlResult) {
+    console.log(
+      `Experiment ${results.experimentName}: expected "${results.controlResult}" but got "${results.candidateResult}"`
+    );
+  }
+}
+
+const experiment = scientist.experiment({
+  name: 'trial2',
+  control: (s: string) => 'Control ' + s,
+  candidate: (s: string) => 'not quite right ' + s,
+  options: { publish }
+});
+
+console.log(experiment('C'));
+```
+
+This prints:
+
+```
+Experiment trial2: expected "Control C" but got "not quite right C"
+Control C
+```
+
+You will probably want to check `results.candidateError` and `results.controlError` as well.
+
+Typically you would replace `console.log` in `publish` with a call to a logging framework, persisting to a database, sending metrics to Grafana, etc.
+
 ## FAQ
 
 Q. Why would I use this library?
