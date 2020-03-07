@@ -95,6 +95,7 @@ Feature parity with Scientist is _not_ a goal.
 - GitHub and all contributors for [Scientist](https://github.com/github/scientist)
 - Microsoft and all contributors for TypeScript
 - Rashauna, Dani, TC, Jon, and many others from Redox, Inc. for educating me about Scientist and TypeScript
+  - Jon for his feedback
 - Titian Cernicova-Dragomir for a key [Stack Overflow answer](https://stackoverflow.com/a/60469374/161457) on types
 - The rest of the TypeScript community (particularly the maintainers of [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped))
 - Michal Zalecki for the article [Creating a TypeScript library with a minimal setup](https://michalzalecki.com/creating-typescript-library-with-a-minimal-setup/)
