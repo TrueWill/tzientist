@@ -10,8 +10,9 @@ export interface Results<TResult> {
   candidateError?: any;
 }
 
-export interface Options<TResult> {
+export interface Options<TParams extends any[], TResult> {
   publish: (results: Results<TResult>) => void;
+  enabled?: (...args: TParams) => boolean;
 }
 
 function defaultPublish<TResult>(results: Results<TResult>): void {
@@ -37,28 +38,33 @@ export function experiment<TParams extends any[], TResult>({
   name: string;
   control: ExperimentFunction<TParams, TResult>;
   candidate: ExperimentFunction<TParams, TResult>;
-  options?: Options<TResult>;
+  options?: Options<TParams, TResult>;
 }): ExperimentFunction<TParams, TResult> {
   return (...args): TResult => {
     let controlResult: TResult | undefined;
     let candidateResult: TResult | undefined;
     let controlError: any;
     let candidateError: any;
+    const isEnabled: boolean = !options.enabled || options.enabled(...args);
 
     function publishResults(): void {
-      options.publish({
-        experimentName: name,
-        controlResult,
-        candidateResult,
-        controlError,
-        candidateError
-      });
+      if (isEnabled) {
+        options.publish({
+          experimentName: name,
+          controlResult,
+          candidateResult,
+          controlError,
+          candidateError
+        });
+      }
     }
 
-    try {
-      candidateResult = candidate(...args);
-    } catch (e) {
-      candidateError = e;
+    if (isEnabled) {
+      try {
+        candidateResult = candidate(...args);
+      } catch (e) {
+        candidateError = e;
+      }
     }
 
     try {

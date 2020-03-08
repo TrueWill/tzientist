@@ -103,7 +103,6 @@ A.
 ## To do
 
 - Async support.
-- Add enabled option to ramp up experiment (such as only run a percentage of the time).
 - Timer support.
 
 ## Why

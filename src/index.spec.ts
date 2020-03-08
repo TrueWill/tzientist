@@ -194,4 +194,80 @@ describe('Experiment', () => {
       expect(results.candidateError).toBeUndefined();
     });
   });
+
+  describe('when enabled option is used', () => {
+    const candidateMock: jest.Mock<string, [string]> = jest.fn<
+      string,
+      [string]
+    >();
+
+    afterEach(() => {
+      candidateMock.mockClear();
+    });
+
+    describe('when control does not throw', () => {
+      function ctrl(s: string): string {
+        return `Ctrl+${s}`;
+      }
+
+      describe('when enabled returns false', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        function enabled(_: string): boolean {
+          return false;
+        }
+
+        it('should not run candidate', () => {
+          const experiment = scientist.experiment({
+            name: 'disabled1',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          experiment('C');
+
+          expect(candidateMock.mock.calls.length).toBe(0);
+        });
+
+        // TODO: it('should pass experiment params to enabled') - move to another fixture
+
+        it('should return result of control', () => {
+          const experiment = scientist.experiment({
+            name: 'disabled2',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          const result: string = experiment('C');
+
+          expect(result).toBe('Ctrl+C');
+        });
+
+        it('should not publish results', () => {
+          const experiment = scientist.experiment({
+            name: 'disabled3',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          experiment('C');
+
+          expect(publishMock.mock.calls.length).toBe(0);
+        });
+      });
+
+      // TODO: Test true case
+    });
+  });
 });
