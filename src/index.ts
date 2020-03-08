@@ -42,13 +42,21 @@ export function experiment<TParams extends any[], TResult>({
   return (...args): TResult => {
     let controlResult: TResult | undefined;
     let candidateResult: TResult | undefined;
-    let hasCandidateResult = false;
     let controlError: any;
     let candidateError: any;
 
+    function publishResults(): void {
+      options.publish({
+        experimentName: name,
+        controlResult,
+        candidateResult,
+        controlError,
+        candidateError
+      });
+    }
+
     try {
       candidateResult = candidate(...args);
-      hasCandidateResult = true;
     } catch (e) {
       candidateError = e;
     }
@@ -57,32 +65,11 @@ export function experiment<TParams extends any[], TResult>({
       controlResult = control(...args);
     } catch (e) {
       controlError = e;
-
-      options.publish({
-        experimentName: name,
-        controlResult,
-        candidateResult,
-        controlError
-      });
-
+      publishResults();
       throw e;
     }
 
-    if (hasCandidateResult) {
-      options.publish({
-        experimentName: name,
-        controlResult,
-        candidateResult
-      });
-    } else if (!hasCandidateResult) {
-      options.publish({
-        experimentName: name,
-        controlResult,
-        controlError,
-        candidateError
-      });
-    }
-
+    publishResults();
     return controlResult;
   };
 }
