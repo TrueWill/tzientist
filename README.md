@@ -98,7 +98,7 @@ Q. What are some guidelines for writing `publish` functions?
 A.
 
 - `publish` should be fast
-- `publish` should **not** throw (catch any errors)
+- `publish` should **not** throw (it should catch any errors)
 
 ## To do
 
@@ -140,6 +140,7 @@ Feature parity with Scientist is _not_ a goal.
 - No ESLint warnings/errors
 - All tests pass
 - No dependencies (other than devDependencies)
+- [Semantic Versioning 2.0.0](https://semver.org/)
 
 **Note**: I use Mac OS, which uses Unix style (LF) line breaks. I haven't added a .gitattributes file yet.
 
@@ -162,5 +163,10 @@ Feature parity with Scientist is _not_ a goal.
 
 I love puns, gaming, and vampires. Tzientist is named after the Tzimisce vampire clan from the game Vampire: The Masquerade; they are the ultimate scientists.
 
+## Legal
+
 Tzimisce and Vampire: The Masquerade are copyrighted by or registered trademarks of CCP hf.
+
 Node.js is a trademark of Joyent, Inc.
+
+Tzientist is not published by, affiliated with, or endorsed by any of these organizations.
