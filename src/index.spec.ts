@@ -267,7 +267,60 @@ describe('Experiment', () => {
         });
       });
 
-      // TODO: Test true case
+      describe('when enabled returns true', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        function enabled(_: string): boolean {
+          return true;
+        }
+
+        it('should run candidate', () => {
+          const experiment = scientist.experiment({
+            name: 'enabled1',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          experiment('C');
+
+          expect(candidateMock.mock.calls.length).toBe(1);
+        });
+
+        it('should return result of control', () => {
+          const experiment = scientist.experiment({
+            name: 'enabled2',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          const result: string = experiment('C');
+
+          expect(result).toBe('Ctrl+C');
+        });
+
+        it('should publish results', () => {
+          const experiment = scientist.experiment({
+            name: 'enabled3',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          experiment('C');
+
+          expect(publishMock.mock.calls.length).toBe(1);
+        });
+      });
     });
   });
 });
