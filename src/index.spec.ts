@@ -343,5 +343,73 @@ describe('Experiment', () => {
         });
       });
     });
+
+    describe('when control throws', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      function ctrl(_: string): string {
+        throw new Error('Kaos!');
+      }
+
+      describe('when enabled returns false', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        function enabled(_: string): boolean {
+          return false;
+        }
+
+        it('should throw', () => {
+          const experiment = scientist.experiment({
+            name: 'disabledthrow1',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          expect(() => experiment('C')).toThrowError('Kaos!');
+        });
+
+        it('should not run candidate', () => {
+          const experiment = scientist.experiment({
+            name: 'disabledthrow2',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          try {
+            experiment('C');
+          } catch {
+            // swallow error
+          }
+
+          expect(candidateMock.mock.calls.length).toBe(0);
+        });
+
+        it('should not publish results', () => {
+          const experiment = scientist.experiment({
+            name: 'disabledthrow3',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          try {
+            experiment('C');
+          } catch {
+            // swallow error
+          }
+
+          expect(publishMock.mock.calls.length).toBe(0);
+        });
+      });
+    });
   });
 });
