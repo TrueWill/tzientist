@@ -232,8 +232,6 @@ describe('Experiment', () => {
           expect(candidateMock.mock.calls.length).toBe(0);
         });
 
-        // TODO: it('should pass experiment params to enabled') - move to another fixture
-
         it('should return result of control', () => {
           const experiment = scientist.experiment({
             name: 'disabled2',
@@ -319,6 +317,29 @@ describe('Experiment', () => {
           experiment('C');
 
           expect(publishMock.mock.calls.length).toBe(1);
+        });
+      });
+
+      describe('when enabled function specified', () => {
+        it('should pass experiment params to enabled', () => {
+          const enabledMock: jest.Mock<boolean, [string]> = jest
+            .fn<boolean, [string]>()
+            .mockReturnValue(false);
+
+          const experiment = scientist.experiment({
+            name: 'paramsToEnabled',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled: enabledMock
+            }
+          });
+
+          experiment('myparam');
+
+          expect(enabledMock.mock.calls.length).toBe(1);
+          expect(enabledMock.mock.calls[0][0]).toBe('myparam');
         });
       });
     });
