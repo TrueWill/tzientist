@@ -93,6 +93,12 @@ A. Tzientist always publishes results, so you can do all of the above in your `p
 
 ---
 
+Q. How do I configure a custom run_if function?
+
+A. Tzientist passes the arguments to the experiment to the `enabled` function (if this is present in the options). If `enabled` returns `false`, the experiment will still return what the control returns but it will not call the candidate nor will it publish results.
+
+---
+
 Q. What are some guidelines for writing `publish` functions?
 
 A.
