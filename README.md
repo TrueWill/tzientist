@@ -30,7 +30,7 @@ console.log(experiment('C'));
 
 This uses the default options and prints:
 
-```
+```Text
 Experiment trial1: difference found
 Control C
 ```
@@ -64,7 +64,7 @@ console.log(experiment('C'));
 
 This prints:
 
-```
+```Text
 Experiment trial2: expected "Control C" but got "not quite right C"
 Control C
 ```
@@ -78,7 +78,7 @@ Typically you would replace `console.log` in `publish` with a call to a logging 
 Running experiments can be expensive. Both the control and the candidate execute. If either may be slow or if the experiment runs in a performance-sensitive context, you may want to run the experiment on a percentage of traffic. You can provide a custom `enabled` function in the options. If `enabled` returns `false`, the experiment will still return what the control returns but it will not call the candidate nor will it publish results. If `enabled` returns `true`, the experiment will run normally. Tzientist passes the arguments to the experiment to the `enabled` function in case you want to base the sampling on them.
 
 ```TypeScript
-function enabled(s: string): boolean {
+function enabled(_: string): boolean {
   // Run candidate 25% of the time
   return Math.floor(Math.random() * 100 + 1) <= 25;
 }
