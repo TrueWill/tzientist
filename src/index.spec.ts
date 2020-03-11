@@ -23,7 +23,10 @@ describe('Experiment', () => {
       const experiment = scientist.experiment({
         name: 'equivalent1',
         control: sum,
-        candidate: sum2
+        candidate: sum2,
+        options: {
+          publish: publishMock
+        }
       });
 
       const result: number = experiment(1, 2);
@@ -195,7 +198,7 @@ describe('Experiment', () => {
     });
   });
 
-  describe('when enabled option is used', () => {
+  describe('when enabled option is specified', () => {
     const candidateMock: jest.Mock<string, [string]> = jest.fn<
       string,
       [string]
@@ -409,6 +412,102 @@ describe('Experiment', () => {
 
           expect(publishMock.mock.calls.length).toBe(0);
         });
+      });
+    });
+  });
+
+  describe('when default options are used', () => {
+    function ctrl(): number {
+      return 1;
+    }
+
+    function candi(): number {
+      return 2;
+    }
+
+    let consoleSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    describe('when no options are specified', () => {
+      it('should use sensible defaults', () => {
+        const experiment = scientist.experiment({
+          name: 'no1',
+          control: ctrl,
+          candidate: candi
+        });
+
+        experiment();
+
+        expect(consoleSpy.mock.calls.length).toBe(1);
+        expect(consoleSpy.mock.calls[0][0]).toBe(
+          'Experiment no1: difference found'
+        );
+      });
+    });
+
+    describe('when only publish option is specified', () => {
+      it('should enable experiment', () => {
+        const experiment = scientist.experiment({
+          name: 'opt1',
+          control: ctrl,
+          candidate: candi,
+          options: {
+            publish: publishMock
+          }
+        });
+
+        experiment();
+
+        expect(publishMock.mock.calls.length).toBe(1);
+        const results = publishMock.mock.calls[0][0];
+        expect(results.controlResult).toBe(1);
+        expect(results.candidateResult).toBe(2);
+      });
+    });
+
+    describe('when only enabled option is specified', () => {
+      it('should use default publish', () => {
+        const experiment = scientist.experiment({
+          name: 'opt2',
+          control: ctrl,
+          candidate: candi,
+          options: {
+            enabled: (): boolean => true
+          }
+        });
+
+        experiment();
+
+        expect(consoleSpy.mock.calls.length).toBe(1);
+        expect(consoleSpy.mock.calls[0][0]).toBe(
+          'Experiment opt2: difference found'
+        );
+      });
+
+      it('should respect enabled', () => {
+        const candidateMock: jest.Mock<number, []> = jest.fn<number, []>();
+
+        const experiment = scientist.experiment({
+          name: 'opt3',
+          control: ctrl,
+          candidate: candidateMock,
+          options: {
+            enabled: (): boolean => false
+          }
+        });
+
+        experiment();
+
+        expect(consoleSpy.mock.calls.length).toBe(0);
+        expect(candidateMock.mock.calls.length).toBe(0);
       });
     });
   });

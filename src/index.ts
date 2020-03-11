@@ -11,7 +11,7 @@ export interface Results<TResult> {
 }
 
 export interface Options<TParams extends any[], TResult> {
-  publish: (results: Results<TResult>) => void;
+  publish?: (results: Results<TResult>) => void;
   enabled?: (...args: TParams) => boolean;
 }
 
@@ -40,6 +40,8 @@ export function experiment<TParams extends any[], TResult>({
   candidate: ExperimentFunction<TParams, TResult>;
   options?: Options<TParams, TResult>;
 }): ExperimentFunction<TParams, TResult> {
+  const publish = options.publish || defaultPublish;
+
   return (...args): TResult => {
     let controlResult: TResult | undefined;
     let candidateResult: TResult | undefined;
@@ -49,7 +51,7 @@ export function experiment<TParams extends any[], TResult>({
 
     function publishResults(): void {
       if (isEnabled) {
-        options.publish({
+        publish({
           experimentName: name,
           controlResult,
           candidateResult,
