@@ -23,7 +23,10 @@ describe('Experiment', () => {
       const experiment = scientist.experiment({
         name: 'equivalent1',
         control: sum,
-        candidate: sum2
+        candidate: sum2,
+        options: {
+          publish: publishMock
+        }
       });
 
       const result: number = experiment(1, 2);
@@ -192,6 +195,320 @@ describe('Experiment', () => {
       expect(results.controlError).toBeDefined();
       expect(results.controlError.message).toBe('Kaos!');
       expect(results.candidateError).toBeUndefined();
+    });
+  });
+
+  describe('when enabled option is specified', () => {
+    const candidateMock: jest.Mock<string, [string]> = jest.fn<
+      string,
+      [string]
+    >();
+
+    afterEach(() => {
+      candidateMock.mockClear();
+    });
+
+    describe('when control does not throw', () => {
+      function ctrl(s: string): string {
+        return `Ctrl+${s}`;
+      }
+
+      describe('when enabled returns false', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        function enabled(_: string): boolean {
+          return false;
+        }
+
+        it('should not run candidate', () => {
+          const experiment = scientist.experiment({
+            name: 'disabled1',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          experiment('C');
+
+          expect(candidateMock.mock.calls.length).toBe(0);
+        });
+
+        it('should return result of control', () => {
+          const experiment = scientist.experiment({
+            name: 'disabled2',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          const result: string = experiment('C');
+
+          expect(result).toBe('Ctrl+C');
+        });
+
+        it('should not publish results', () => {
+          const experiment = scientist.experiment({
+            name: 'disabled3',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          experiment('C');
+
+          expect(publishMock.mock.calls.length).toBe(0);
+        });
+      });
+
+      describe('when enabled returns true', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        function enabled(_: string): boolean {
+          return true;
+        }
+
+        it('should run candidate', () => {
+          const experiment = scientist.experiment({
+            name: 'enabled1',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          experiment('C');
+
+          expect(candidateMock.mock.calls.length).toBe(1);
+        });
+
+        it('should return result of control', () => {
+          const experiment = scientist.experiment({
+            name: 'enabled2',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          const result: string = experiment('C');
+
+          expect(result).toBe('Ctrl+C');
+        });
+
+        it('should publish results', () => {
+          const experiment = scientist.experiment({
+            name: 'enabled3',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          experiment('C');
+
+          expect(publishMock.mock.calls.length).toBe(1);
+        });
+      });
+
+      describe('when enabled function specified', () => {
+        it('should pass experiment params to enabled', () => {
+          const enabledMock: jest.Mock<boolean, [string]> = jest
+            .fn<boolean, [string]>()
+            .mockReturnValue(false);
+
+          const experiment = scientist.experiment({
+            name: 'paramsToEnabled',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled: enabledMock
+            }
+          });
+
+          experiment('myparam');
+
+          expect(enabledMock.mock.calls.length).toBe(1);
+          expect(enabledMock.mock.calls[0][0]).toBe('myparam');
+        });
+      });
+    });
+
+    describe('when control throws', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      function ctrl(_: string): string {
+        throw new Error('Kaos!');
+      }
+
+      describe('when enabled returns false', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        function enabled(_: string): boolean {
+          return false;
+        }
+
+        it('should throw', () => {
+          const experiment = scientist.experiment({
+            name: 'disabledthrow1',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          expect(() => experiment('C')).toThrowError('Kaos!');
+        });
+
+        it('should not run candidate', () => {
+          const experiment = scientist.experiment({
+            name: 'disabledthrow2',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          try {
+            experiment('C');
+          } catch {
+            // swallow error
+          }
+
+          expect(candidateMock.mock.calls.length).toBe(0);
+        });
+
+        it('should not publish results', () => {
+          const experiment = scientist.experiment({
+            name: 'disabledthrow3',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          try {
+            experiment('C');
+          } catch {
+            // swallow error
+          }
+
+          expect(publishMock.mock.calls.length).toBe(0);
+        });
+      });
+    });
+  });
+
+  describe('when default options are used', () => {
+    function ctrl(): number {
+      return 1;
+    }
+
+    function candi(): number {
+      return 2;
+    }
+
+    let consoleSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    describe('when no options are specified', () => {
+      it('should use sensible defaults', () => {
+        const experiment = scientist.experiment({
+          name: 'no1',
+          control: ctrl,
+          candidate: candi
+        });
+
+        experiment();
+
+        expect(consoleSpy.mock.calls.length).toBe(1);
+        expect(consoleSpy.mock.calls[0][0]).toBe(
+          'Experiment no1: difference found'
+        );
+      });
+    });
+
+    describe('when only publish option is specified', () => {
+      it('should enable experiment', () => {
+        const experiment = scientist.experiment({
+          name: 'opt1',
+          control: ctrl,
+          candidate: candi,
+          options: {
+            publish: publishMock
+          }
+        });
+
+        experiment();
+
+        expect(publishMock.mock.calls.length).toBe(1);
+        const results = publishMock.mock.calls[0][0];
+        expect(results.controlResult).toBe(1);
+        expect(results.candidateResult).toBe(2);
+      });
+    });
+
+    describe('when only enabled option is specified', () => {
+      it('should use default publish', () => {
+        const experiment = scientist.experiment({
+          name: 'opt2',
+          control: ctrl,
+          candidate: candi,
+          options: {
+            enabled: (): boolean => true
+          }
+        });
+
+        experiment();
+
+        expect(consoleSpy.mock.calls.length).toBe(1);
+        expect(consoleSpy.mock.calls[0][0]).toBe(
+          'Experiment opt2: difference found'
+        );
+      });
+
+      it('should respect enabled', () => {
+        const candidateMock: jest.Mock<number, []> = jest.fn<number, []>();
+
+        const experiment = scientist.experiment({
+          name: 'opt3',
+          control: ctrl,
+          candidate: candidateMock,
+          options: {
+            enabled: (): boolean => false
+          }
+        });
+
+        experiment();
+
+        expect(consoleSpy.mock.calls.length).toBe(0);
+        expect(candidateMock.mock.calls.length).toBe(0);
+      });
     });
   });
 });
