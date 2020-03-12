@@ -99,6 +99,12 @@ A. You want to refactor or replace existing code, but that code is difficult or 
 
 ---
 
+Q. What if my candidate or control have side effects (such as updating a database)?
+
+A. In general, don't use Tzientist in those cases.
+
+---
+
 Q. My candidate and control take different parameters. How do I handle that?
 
 A. Create a facade for one or both so that the parameters match. You don't need to use all of the parameters in both functions.
@@ -117,12 +123,12 @@ A. Tzientist passes the arguments to the experiment to the `enabled` function (i
 
 ---
 
-Q. What are some guidelines for writing `publish` functions?
+Q. What are some guidelines for writing `publish` and `enabled` functions?
 
 A.
 
-- `publish` should be fast
-- `publish` should **not** throw (it should catch any errors)
+- Both `publish` and `enabled` should be fast
+- Both `publish` and `enabled` should **not** throw (they should catch any errors)
 
 ## To do
 
