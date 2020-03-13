@@ -512,3 +512,29 @@ describe('Experiment', () => {
     });
   });
 });
+
+describe('Experiment (async)', () => {
+  describe('when functions are equivalent', () => {
+    async function sum(a: number, b: number): Promise<number> {
+      await new Promise(resolve => setTimeout(resolve, 250));
+      return a + b;
+    }
+
+    async function sum2(a: number, b: number): Promise<number> {
+      await new Promise(resolve => setTimeout(resolve, 125));
+      return b + a;
+    }
+
+    it('should await result', async () => {
+      const experiment = scientist.experiment({
+        name: 'async equivalent1',
+        control: sum,
+        candidate: sum2
+      });
+
+      const result: number = await experiment(1, 2);
+
+      expect(result).toBe(3);
+    });
+  });
+});
