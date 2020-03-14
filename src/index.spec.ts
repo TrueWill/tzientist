@@ -514,14 +514,17 @@ describe('Experiment', () => {
 });
 
 describe('Experiment (async)', () => {
+  const sleep = (ms: number): Promise<void> =>
+    new Promise(resolve => setTimeout(resolve, ms));
+
   describe('when functions are equivalent', () => {
     async function sum(a: number, b: number): Promise<number> {
-      await new Promise(resolve => setTimeout(resolve, 250));
+      await sleep(250);
       return a + b;
     }
 
     async function sum2(a: number, b: number): Promise<number> {
-      await new Promise(resolve => setTimeout(resolve, 125));
+      await sleep(125);
       return b + a;
     }
 
