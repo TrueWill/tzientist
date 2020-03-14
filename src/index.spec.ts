@@ -1,6 +1,6 @@
 import * as scientist from './index';
 
-describe('Experiment', () => {
+describe('experiment', () => {
   const publishMock: jest.Mock<void, [scientist.Results<any>]> = jest.fn<
     void,
     [scientist.Results<any>]
@@ -513,11 +513,22 @@ describe('Experiment', () => {
   });
 });
 
-describe('Experiment (async)', () => {
+describe('experimentAsync', () => {
   const sleep = (ms: number): Promise<void> =>
     new Promise(resolve => setTimeout(resolve, ms));
 
+  // TODO: Run in parallel
+
   describe('when functions are equivalent', () => {
+    const publishMock: jest.Mock<void, [scientist.Results<number>]> = jest.fn<
+      void,
+      [scientist.Results<number>]
+    >();
+
+    afterEach(() => {
+      publishMock.mockClear();
+    });
+
     async function sum(a: number, b: number): Promise<number> {
       await sleep(250);
       return a + b;
@@ -529,15 +540,75 @@ describe('Experiment (async)', () => {
     }
 
     it('should await result', async () => {
-      const experiment = scientist.experiment({
+      const experiment = scientist.experimentAsync({
         name: 'async equivalent1',
         control: sum,
-        candidate: sum2
+        candidate: sum2,
+        options: {
+          publish: publishMock
+        }
       });
 
       const result: number = await experiment(1, 2);
 
       expect(result).toBe(3);
+    });
+  });
+
+  describe('when function results differ', () => {
+    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+      void,
+      [scientist.Results<string>]
+    >();
+
+    afterEach(() => {
+      publishMock.mockClear();
+    });
+
+    async function ctrl(s: string): Promise<string> {
+      await sleep(250);
+      return `Ctrl+${s}`;
+    }
+
+    async function candi(s: string): Promise<string> {
+      await sleep(125);
+      return s;
+    }
+
+    it('should await result of control', async () => {
+      const experiment = scientist.experimentAsync({
+        name: 'async differ1',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      const result: string = await experiment('C');
+
+      expect(result).toBe('Ctrl+C');
+    });
+
+    it('should publish results', async () => {
+      const experiment = scientist.experimentAsync({
+        name: 'async differ2',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      await experiment('C');
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('async differ2');
+      expect(results.controlResult).toBe('Ctrl+C');
+      expect(results.candidateResult).toBe('C');
+      expect(results.controlError).toBeUndefined();
+      expect(results.candidateError).toBeUndefined();
     });
   });
 });

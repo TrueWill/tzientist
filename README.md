@@ -132,7 +132,6 @@ A.
 
 ## To do
 
-- Async support.
 - Timer support.
 
 ## Why

@@ -2,6 +2,11 @@ export type ExperimentFunction<TParams extends any[], TResult> = (
   ...args: TParams
 ) => TResult;
 
+export type ExperimentAsyncFunction<
+  TParams extends any[],
+  TResult
+> = ExperimentFunction<TParams, Promise<TResult>>;
+
 export interface Results<TResult> {
   experimentName: string;
   controlResult?: TResult;
@@ -71,6 +76,59 @@ export function experiment<TParams extends any[], TResult>({
 
     try {
       controlResult = control(...args);
+    } catch (e) {
+      controlError = e;
+      publishResults();
+      throw e;
+    }
+
+    publishResults();
+    return controlResult;
+  };
+}
+
+export function experimentAsync<TParams extends any[], TResult>({
+  name,
+  control,
+  candidate,
+  options = defaultOptions
+}: {
+  name: string;
+  control: ExperimentAsyncFunction<TParams, TResult>;
+  candidate: ExperimentAsyncFunction<TParams, TResult>;
+  options?: Options<TParams, TResult>;
+}): ExperimentAsyncFunction<TParams, TResult> {
+  const publish = options.publish || defaultPublish;
+
+  return async (...args): Promise<TResult> => {
+    let controlResult: TResult | undefined;
+    let candidateResult: TResult | undefined;
+    let controlError: any;
+    let candidateError: any;
+    const isEnabled: boolean = !options.enabled || options.enabled(...args);
+
+    function publishResults(): void {
+      if (isEnabled) {
+        publish({
+          experimentName: name,
+          controlResult,
+          candidateResult,
+          controlError,
+          candidateError
+        });
+      }
+    }
+
+    if (isEnabled) {
+      try {
+        candidateResult = await candidate(...args);
+      } catch (e) {
+        candidateError = e;
+      }
+    }
+
+    try {
+      controlResult = await control(...args);
     } catch (e) {
       controlError = e;
       publishResults();
