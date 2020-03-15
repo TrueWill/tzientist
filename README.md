@@ -91,6 +91,25 @@ const experiment = scientist.experiment({
 });
 ```
 
+### Asynchronous code
+
+If your functions are async (returning a Promise), use `experimentAsync`. The resulting experiment function will return a Promise.
+
+```TypeScript
+const experiment = scientist.experimentAsync({
+  name: 'async trial1',
+  control: myAsyncControl,
+  candidate: myAsyncCandidate,
+  options: { publish }
+});
+
+const result: number = await experiment(1, 2);
+```
+
+The `control` and the `candidate` will be run in parallel (that is, concurrently). Options are the same as for a normal `experiment`.
+
+If your functions use callbacks, look at wrapping them with [util.promisify](https://nodejs.org/api/util.html#util_util_promisify_original).
+
 ## FAQ
 
 Q. Why would I use this library?
