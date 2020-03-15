@@ -35,7 +35,9 @@ Experiment trial1: difference found
 Control C
 ```
 
-The `control` is the source of truth. It's typically the legacy code you're trying to replace. The `experiment` will always return whatever the `control` returns (or will throw if the `control` throws).
+Note that `scientist.experiment` is a factory; it returns a function (named `experiment` in the example) that matches the signature of the `control` and the `candidate`.
+
+The `control` is the source of truth. It's typically the legacy code you're trying to replace. The `experiment` (the function returned by `scientist.experiment`) will always return whatever the `control` returns (**or will throw if the `control` throws**). You would replace the original call to `control` in your codebase with a call to `experiment`.
 
 The `candidate` is the new code you're testing that's intended to replace the `control` eventually. The `experiment` runs this code and publishes the result (along with the `control` result). The `experiment` will swallow any errors thrown by the `candidate`.
 
@@ -91,6 +93,25 @@ const experiment = scientist.experiment({
 });
 ```
 
+### Asynchronous code
+
+If your functions are async (returning a Promise), use `experimentAsync`. The resulting experiment function will return a Promise.
+
+```TypeScript
+const experiment = scientist.experimentAsync({
+  name: 'async trial1',
+  control: myAsyncControl,
+  candidate: myAsyncCandidate,
+  options: { publish }
+});
+
+const result: number = await experiment(1, 2);
+```
+
+The `control` and the `candidate` will be run in parallel (that is, concurrently). Options are the same as for a normal `experiment`.
+
+If your functions use callbacks, look at wrapping them with [util.promisify](https://nodejs.org/api/util.html#util_util_promisify_original).
+
 ## FAQ
 
 Q. Why would I use this library?
@@ -132,7 +153,6 @@ A.
 
 ## To do
 
-- Async support.
 - Timer support.
 
 ## Why
