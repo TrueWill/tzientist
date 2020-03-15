@@ -553,6 +553,27 @@ describe('experimentAsync', () => {
 
       expect(result).toBe(3);
     });
+
+    it('should publish results', async () => {
+      const experiment = scientist.experimentAsync({
+        name: 'async equivalent2',
+        control: sum,
+        candidate: sum2,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      await experiment(1, 2);
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('async equivalent2');
+      expect(results.controlResult).toBe(3);
+      expect(results.candidateResult).toBe(3);
+      expect(results.controlError).toBeUndefined();
+      expect(results.candidateError).toBeUndefined();
+    });
   });
 
   describe('when function results differ', () => {
@@ -609,6 +630,264 @@ describe('experimentAsync', () => {
       expect(results.candidateResult).toBe('C');
       expect(results.controlError).toBeUndefined();
       expect(results.candidateError).toBeUndefined();
+    });
+  });
+
+  describe('when candidate rejects', () => {
+    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+      void,
+      [scientist.Results<string>]
+    >();
+
+    afterEach(() => {
+      publishMock.mockClear();
+    });
+
+    async function ctrl(): Promise<string> {
+      await sleep(125);
+      return 'Everything is under control';
+    }
+
+    async function candi(): Promise<string> {
+      return Promise.reject(new Error("Candy I can't let you go"));
+    }
+
+    it('should await result of control', async () => {
+      const experiment = scientist.experimentAsync({
+        name: 'async throw1',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      const result: string = await experiment();
+
+      expect(result).toBe('Everything is under control');
+    });
+
+    it('should publish results', async () => {
+      const experiment = scientist.experimentAsync({
+        name: 'async throw2',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      await experiment();
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('async throw2');
+      expect(results.controlResult).toBe('Everything is under control');
+      expect(results.candidateResult).toBeUndefined();
+      expect(results.controlError).toBeUndefined();
+      expect(results.candidateError).toBeDefined();
+      expect(results.candidateError.message).toBe("Candy I can't let you go");
+    });
+  });
+
+  describe('when control rejects', () => {
+    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+      void,
+      [scientist.Results<string>]
+    >();
+
+    afterEach(() => {
+      publishMock.mockClear();
+    });
+
+    async function ctrl(): Promise<string> {
+      throw new Error('Kaos!');
+    }
+
+    async function candi(): Promise<string> {
+      await sleep(125);
+      return 'Kane';
+    }
+
+    it('should reject', () => {
+      const experiment = scientist.experimentAsync({
+        name: 'async cthrow1',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      return expect(experiment()).rejects.toMatchObject({ message: 'Kaos!' });
+    });
+
+    it('should publish results', async () => {
+      const experiment = scientist.experimentAsync({
+        name: 'async cthrow2',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      try {
+        await experiment();
+      } catch {
+        // swallow error
+      }
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('async cthrow2');
+      expect(results.controlResult).toBeUndefined();
+      expect(results.candidateResult).toBe('Kane');
+      expect(results.controlError).toBeDefined();
+      expect(results.controlError.message).toBe('Kaos!');
+      expect(results.candidateError).toBeUndefined();
+    });
+  });
+
+  describe('when enabled option is specified', () => {
+    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+      void,
+      [scientist.Results<string>]
+    >();
+
+    const candidateMock: jest.Mock<Promise<string>, [string]> = jest.fn<
+      Promise<string>,
+      [string]
+    >();
+
+    afterEach(() => {
+      publishMock.mockClear();
+      candidateMock.mockClear();
+    });
+
+    describe('when enabled returns false', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      function enabled(_: string): boolean {
+        return false;
+      }
+
+      describe('when control resolves', () => {
+        async function ctrl(s: string): Promise<string> {
+          await sleep(125);
+          return `Ctrl+${s}`;
+        }
+
+        it('should not run candidate', async () => {
+          const experiment = scientist.experimentAsync({
+            name: 'async disabled1',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          await experiment('C');
+
+          expect(candidateMock.mock.calls.length).toBe(0);
+        });
+
+        it('should await result of control', async () => {
+          const experiment = scientist.experimentAsync({
+            name: 'async disabled2',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          const result: string = await experiment('C');
+
+          expect(result).toBe('Ctrl+C');
+        });
+
+        it('should not publish results', async () => {
+          const experiment = scientist.experimentAsync({
+            name: 'async disabled3',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          await experiment('C');
+
+          expect(publishMock.mock.calls.length).toBe(0);
+        });
+      });
+
+      describe('when control rejects', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        async function ctrl(_: string): Promise<string> {
+          throw new Error('Kaos!');
+        }
+
+        it('should reject', () => {
+          const experiment = scientist.experimentAsync({
+            name: 'async cthrow1',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          return expect(experiment('C')).rejects.toMatchObject({
+            message: 'Kaos!'
+          });
+        });
+
+        it('should not run candidate', async () => {
+          const experiment = scientist.experimentAsync({
+            name: 'async disabledthrow2',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          try {
+            await experiment('C');
+          } catch {
+            // swallow error
+          }
+
+          expect(candidateMock.mock.calls.length).toBe(0);
+        });
+
+        it('should not publish results', async () => {
+          const experiment = scientist.experimentAsync({
+            name: 'async disabledthrow3',
+            control: ctrl,
+            candidate: candidateMock,
+            options: {
+              publish: publishMock,
+              enabled
+            }
+          });
+
+          try {
+            await experiment('C');
+          } catch {
+            // swallow error
+          }
+
+          expect(publishMock.mock.calls.length).toBe(0);
+        });
+      });
     });
   });
 });
