@@ -120,22 +120,31 @@ export function experimentAsync<TParams extends any[], TResult>({
     }
 
     if (isEnabled) {
-      try {
-        candidateResult = await candidate(...args);
-      } catch (e) {
-        candidateError = e;
-      }
-    }
-
-    try {
-      controlResult = await control(...args);
-    } catch (e) {
-      controlError = e;
-      publishResults();
-      throw e;
+      // Run in parallel
+      [candidateResult, controlResult] = await Promise.all([
+        candidate(...args).catch(e => {
+          candidateError = e;
+          return undefined;
+        }),
+        control(...args).catch(e => {
+          controlError = e;
+          return undefined;
+        })
+      ]);
+    } else {
+      controlResult = await control(...args).catch(e => {
+        controlError = e;
+        return undefined;
+      });
     }
 
     publishResults();
-    return controlResult;
+
+    if (controlError) {
+      throw controlError;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return controlResult!;
   };
 }

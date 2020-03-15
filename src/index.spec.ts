@@ -517,8 +517,6 @@ describe('experimentAsync', () => {
   const sleep = (ms: number): Promise<void> =>
     new Promise(resolve => setTimeout(resolve, ms));
 
-  // TODO: Run in parallel
-
   describe('when functions are equivalent', () => {
     const publishMock: jest.Mock<void, [scientist.Results<number>]> = jest.fn<
       void,
@@ -888,6 +886,51 @@ describe('experimentAsync', () => {
           expect(publishMock.mock.calls.length).toBe(0);
         });
       });
+    });
+  });
+
+  describe('when functions are slow', () => {
+    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+      void,
+      [scientist.Results<string>]
+    >();
+
+    afterEach(() => {
+      publishMock.mockClear();
+    });
+
+    const msPerFunction = 1000;
+
+    async function ctrl(): Promise<string> {
+      await sleep(msPerFunction);
+      return 'Control';
+    }
+
+    async function candi(): Promise<string> {
+      await sleep(msPerFunction);
+      return 'Candidate';
+    }
+
+    it('should run functions in parallel', async () => {
+      const nsPerMs = 1000000;
+      const allowedOverhead = 125;
+
+      const experiment = scientist.experimentAsync({
+        name: 'async parallel1',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      const start = process.hrtime.bigint();
+      await experiment();
+      const end = process.hrtime.bigint();
+
+      const elapsedMs = Number((end - start) / BigInt(nsPerMs));
+
+      expect(elapsedMs).toBeLessThan(msPerFunction + allowedOverhead);
     });
   });
 });
