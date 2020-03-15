@@ -35,7 +35,9 @@ Experiment trial1: difference found
 Control C
 ```
 
-The `control` is the source of truth. It's typically the legacy code you're trying to replace. The `experiment` will always return whatever the `control` returns (**or will throw if the `control` throws**).
+Note that `scientist.experiment` is a factory; it returns a function (named `experiment` in the example) that matches the signature of the `control` and the `candidate`.
+
+The `control` is the source of truth. It's typically the legacy code you're trying to replace. The `experiment` (the function returned by `scientist.experiment`) will always return whatever the `control` returns (**or will throw if the `control` throws**). You would replace the original call to `control` in your codebase with a call to `experiment`.
 
 The `candidate` is the new code you're testing that's intended to replace the `control` eventually. The `experiment` runs this code and publishes the result (along with the `control` result). The `experiment` will swallow any errors thrown by the `candidate`.
 
