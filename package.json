@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "test": "jest",
+    "cover": "jest --coverage --coverageProvider=v8",
     "lint": "eslint \"src/**/*.ts\"",
     "prepare": "npm run build",
     "build": "tsc"
