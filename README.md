@@ -151,6 +151,12 @@ A.
 - Both `publish` and `enabled` should be fast
 - Both `publish` and `enabled` should **not** throw (they should catch any errors)
 
+---
+
+Q. Why doesn't Tzientist randomize the order in which the control and the candidate are run?
+
+A. Because those functions should not have side effects.
+
 ## To do
 
 - Timer support.
