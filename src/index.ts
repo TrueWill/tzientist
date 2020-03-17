@@ -7,8 +7,9 @@ export type ExperimentAsyncFunction<
   TResult
 > = ExperimentFunction<TParams, Promise<TResult>>;
 
-export interface Results<TResult> {
+export interface Results<TParams extends any[], TResult> {
   experimentName: string;
+  experimentArguments: TParams;
   controlResult?: TResult;
   candidateResult?: TResult;
   controlError?: any;
@@ -16,11 +17,13 @@ export interface Results<TResult> {
 }
 
 export interface Options<TParams extends any[], TResult> {
-  publish?: (results: Results<TResult>) => void;
+  publish?: (results: Results<TParams, TResult>) => void;
   enabled?: (...args: TParams) => boolean;
 }
 
-function defaultPublish<TResult>(results: Results<TResult>): void {
+function defaultPublish<TParams extends any[], TResult>(
+  results: Results<TParams, TResult>
+): void {
   if (
     results.candidateResult !== results.controlResult ||
     (results.candidateError && !results.controlError) ||
@@ -58,6 +61,7 @@ export function experiment<TParams extends any[], TResult>({
       if (isEnabled) {
         publish({
           experimentName: name,
+          experimentArguments: args,
           controlResult,
           candidateResult,
           controlError,
@@ -111,6 +115,7 @@ export function experimentAsync<TParams extends any[], TResult>({
       if (isEnabled) {
         publish({
           experimentName: name,
+          experimentArguments: args,
           controlResult,
           candidateResult,
           controlError,

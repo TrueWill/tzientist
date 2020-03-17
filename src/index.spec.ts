@@ -1,9 +1,9 @@
 import * as scientist from './index';
 
 describe('experiment', () => {
-  const publishMock: jest.Mock<void, [scientist.Results<any>]> = jest.fn<
+  const publishMock: jest.Mock<void, [scientist.Results<any[], any>]> = jest.fn<
     void,
-    [scientist.Results<any>]
+    [scientist.Results<any[], any>]
   >();
 
   afterEach(() => {
@@ -49,6 +49,7 @@ describe('experiment', () => {
       expect(publishMock.mock.calls.length).toBe(1);
       const results = publishMock.mock.calls[0][0];
       expect(results.experimentName).toBe('equivalent2');
+      expect(results.experimentArguments).toEqual([1, 2]);
       expect(results.controlResult).toBe(3);
       expect(results.candidateResult).toBe(3);
       expect(results.controlError).toBeUndefined();
@@ -95,6 +96,7 @@ describe('experiment', () => {
       expect(publishMock.mock.calls.length).toBe(1);
       const results = publishMock.mock.calls[0][0];
       expect(results.experimentName).toBe('differ2');
+      expect(results.experimentArguments).toEqual(['C']);
       expect(results.controlResult).toBe('Ctrl+C');
       expect(results.candidateResult).toBe('C');
       expect(results.controlError).toBeUndefined();
@@ -141,6 +143,7 @@ describe('experiment', () => {
       expect(publishMock.mock.calls.length).toBe(1);
       const results = publishMock.mock.calls[0][0];
       expect(results.experimentName).toBe('throw2');
+      expect(results.experimentArguments).toEqual([]);
       expect(results.controlResult).toBe('Everything is under control');
       expect(results.candidateResult).toBeUndefined();
       expect(results.controlError).toBeUndefined();
@@ -190,6 +193,7 @@ describe('experiment', () => {
       expect(publishMock.mock.calls.length).toBe(1);
       const results = publishMock.mock.calls[0][0];
       expect(results.experimentName).toBe('cthrow2');
+      expect(results.experimentArguments).toEqual([]);
       expect(results.controlResult).toBeUndefined();
       expect(results.candidateResult).toBe('Kane');
       expect(results.controlError).toBeDefined();
@@ -518,10 +522,10 @@ describe('experimentAsync', () => {
     new Promise(resolve => setTimeout(resolve, ms));
 
   describe('when functions are equivalent', () => {
-    const publishMock: jest.Mock<void, [scientist.Results<number>]> = jest.fn<
+    const publishMock: jest.Mock<
       void,
-      [scientist.Results<number>]
-    >();
+      [scientist.Results<[number, number], number>]
+    > = jest.fn<void, [scientist.Results<[number, number], number>]>();
 
     afterEach(() => {
       publishMock.mockClear();
@@ -567,6 +571,7 @@ describe('experimentAsync', () => {
       expect(publishMock.mock.calls.length).toBe(1);
       const results = publishMock.mock.calls[0][0];
       expect(results.experimentName).toBe('async equivalent2');
+      expect(results.experimentArguments).toEqual([1, 2]);
       expect(results.controlResult).toBe(3);
       expect(results.candidateResult).toBe(3);
       expect(results.controlError).toBeUndefined();
@@ -575,10 +580,10 @@ describe('experimentAsync', () => {
   });
 
   describe('when function results differ', () => {
-    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+    const publishMock: jest.Mock<
       void,
-      [scientist.Results<string>]
-    >();
+      [scientist.Results<[string], string>]
+    > = jest.fn<void, [scientist.Results<[string], string>]>();
 
     afterEach(() => {
       publishMock.mockClear();
@@ -624,6 +629,7 @@ describe('experimentAsync', () => {
       expect(publishMock.mock.calls.length).toBe(1);
       const results = publishMock.mock.calls[0][0];
       expect(results.experimentName).toBe('async differ2');
+      expect(results.experimentArguments).toEqual(['C']);
       expect(results.controlResult).toBe('Ctrl+C');
       expect(results.candidateResult).toBe('C');
       expect(results.controlError).toBeUndefined();
@@ -632,10 +638,10 @@ describe('experimentAsync', () => {
   });
 
   describe('when candidate rejects', () => {
-    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+    const publishMock: jest.Mock<
       void,
-      [scientist.Results<string>]
-    >();
+      [scientist.Results<[], string>]
+    > = jest.fn<void, [scientist.Results<[], string>]>();
 
     afterEach(() => {
       publishMock.mockClear();
@@ -680,6 +686,7 @@ describe('experimentAsync', () => {
       expect(publishMock.mock.calls.length).toBe(1);
       const results = publishMock.mock.calls[0][0];
       expect(results.experimentName).toBe('async throw2');
+      expect(results.experimentArguments).toEqual([]);
       expect(results.controlResult).toBe('Everything is under control');
       expect(results.candidateResult).toBeUndefined();
       expect(results.controlError).toBeUndefined();
@@ -689,10 +696,10 @@ describe('experimentAsync', () => {
   });
 
   describe('when control rejects', () => {
-    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+    const publishMock: jest.Mock<
       void,
-      [scientist.Results<string>]
-    >();
+      [scientist.Results<[], string>]
+    > = jest.fn<void, [scientist.Results<[], string>]>();
 
     afterEach(() => {
       publishMock.mockClear();
@@ -739,6 +746,7 @@ describe('experimentAsync', () => {
       expect(publishMock.mock.calls.length).toBe(1);
       const results = publishMock.mock.calls[0][0];
       expect(results.experimentName).toBe('async cthrow2');
+      expect(results.experimentArguments).toEqual([]);
       expect(results.controlResult).toBeUndefined();
       expect(results.candidateResult).toBe('Kane');
       expect(results.controlError).toBeDefined();
@@ -748,10 +756,10 @@ describe('experimentAsync', () => {
   });
 
   describe('when enabled option is specified', () => {
-    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+    const publishMock: jest.Mock<
       void,
-      [scientist.Results<string>]
-    >();
+      [scientist.Results<[string], string>]
+    > = jest.fn<void, [scientist.Results<[string], string>]>();
 
     const candidateMock: jest.Mock<Promise<string>, [string]> = jest.fn<
       Promise<string>,
@@ -890,10 +898,10 @@ describe('experimentAsync', () => {
   });
 
   describe('when functions are slow', () => {
-    const publishMock: jest.Mock<void, [scientist.Results<string>]> = jest.fn<
+    const publishMock: jest.Mock<
       void,
-      [scientist.Results<string>]
-    >();
+      [scientist.Results<[], string>]
+    > = jest.fn<void, [scientist.Results<[], string>]>();
 
     afterEach(() => {
       publishMock.mockClear();

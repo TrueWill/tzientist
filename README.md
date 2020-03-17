@@ -46,7 +46,7 @@ The `experiment` runs both the `control` and the `candidate`, and it publishes t
 ### Publishing results
 
 ```TypeScript
-function publish(results: scientist.Results<string>): void {
+function publish(results: scientist.Results<[string], string>): void {
   if (results.candidateResult !== results.controlResult) {
     console.log(
       `Experiment ${results.experimentName}: expected "${results.controlResult}" but got "${results.candidateResult}"`
@@ -74,6 +74,8 @@ Control C
 You will probably want to check `results.candidateError` and `results.controlError` as well.
 
 Typically you would replace `console.log` in `publish` with a call to a logging framework, persisting to a database, sending metrics to Grafana, etc.
+
+The results include the arguments passed to the experiment (`experimentArguments`).
 
 ### Sampling
 
