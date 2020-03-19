@@ -37,6 +37,15 @@ const defaultOptions = {
   publish: defaultPublish
 };
 
+/**
+ * A factory that creates an experiment function.
+ *
+ * @param name - The name of the experiment, typically for use in publish.
+ * @param control - The legacy function you are trying to replace.
+ * @param candidate - The new function intended to replace the control.
+ * @param [options] - Options for the experiment. You will usually want to specify a publish function.
+ * @returns A function that acts like the control while also running the candidate and publishing results.
+ */
 export function experiment<TParams extends any[], TResult>({
   name,
   control,
@@ -91,6 +100,15 @@ export function experiment<TParams extends any[], TResult>({
   };
 }
 
+/**
+ * A factory that creates an asynchronous experiment function.
+ *
+ * @param name - The name of the experiment, typically for use in publish.
+ * @param control - The legacy async function you are trying to replace.
+ * @param candidate - The new async function intended to replace the control.
+ * @param [options] - Options for the experiment. You will usually want to specify a publish function.
+ * @returns An async function that acts like the control while also running the candidate and publishing results.
+ */
 export function experimentAsync<TParams extends any[], TResult>({
   name,
   control,
