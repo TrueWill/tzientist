@@ -145,17 +145,17 @@ export function experimentAsync<TParams extends any[], TResult>({
     if (isEnabled) {
       // Run in parallel
       [candidateResult, controlResult] = await Promise.all([
-        candidate(...args).catch(e => {
+        candidate(...args).catch((e) => {
           candidateError = e;
           return undefined;
         }),
-        control(...args).catch(e => {
+        control(...args).catch((e) => {
           controlError = e;
           return undefined;
         })
       ]);
     } else {
-      controlResult = await control(...args).catch(e => {
+      controlResult = await control(...args).catch((e) => {
         controlError = e;
         return undefined;
       });

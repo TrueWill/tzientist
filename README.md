@@ -193,7 +193,7 @@ Feature parity with Scientist is _not_ a goal.
 
 - TypeScript strict option
 - No classes
-- Prettier with single quotes
+- Prettier 2 with single quotes and no trailing commas
 - No ESLint warnings/errors
 - All tests pass
 - No dependencies (other than devDependencies)

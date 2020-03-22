@@ -519,7 +519,7 @@ describe('experiment', () => {
 
 describe('experimentAsync', () => {
   const sleep = (ms: number): Promise<void> =>
-    new Promise(resolve => setTimeout(resolve, ms));
+    new Promise((resolve) => setTimeout(resolve, ms));
 
   describe('when functions are equivalent', () => {
     const publishMock: jest.Mock<
