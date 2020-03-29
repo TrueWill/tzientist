@@ -211,7 +211,7 @@ describe('experiment', () => {
       throw new Error("Candy I can't let you go");
     }
 
-    it('should throw', () => {
+    it('should throw control error', () => {
       const experiment = scientist.experiment({
         name: 'bothrow1',
         control: ctrl,
@@ -803,6 +803,66 @@ describe('experimentAsync', () => {
       expect(results.controlError).toBeDefined();
       expect(results.controlError.message).toBe('Kaos!');
       expect(results.candidateError).toBeUndefined();
+    });
+  });
+
+  describe('when both reject', () => {
+    const publishMock: jest.Mock<
+      void,
+      [scientist.Results<[], string>]
+    > = jest.fn<void, [scientist.Results<[], string>]>();
+
+    afterEach(() => {
+      publishMock.mockClear();
+    });
+
+    async function ctrl(): Promise<string> {
+      throw new Error('Kaos!');
+    }
+
+    async function candi(): Promise<string> {
+      return Promise.reject(new Error("Candy I can't let you go"));
+    }
+
+    it('should reject with control error', () => {
+      const experiment = scientist.experimentAsync({
+        name: 'async bothrow1',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      return expect(experiment()).rejects.toMatchObject({ message: 'Kaos!' });
+    });
+
+    it('should publish results', async () => {
+      const experiment = scientist.experimentAsync({
+        name: 'async bothrow2',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      try {
+        await experiment();
+      } catch {
+        // swallow error
+      }
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('async bothrow2');
+      expect(results.experimentArguments).toEqual([]);
+      expect(results.controlResult).toBeUndefined();
+      expect(results.candidateResult).toBeUndefined();
+      expect(results.controlError).toBeDefined();
+      expect(results.controlError.message).toBe('Kaos!');
+      expect(results.candidateError).toBeDefined();
+      expect(results.candidateError.message).toBe("Candy I can't let you go");
     });
   });
 
