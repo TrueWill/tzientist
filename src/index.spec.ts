@@ -202,6 +202,57 @@ describe('experiment', () => {
     });
   });
 
+  describe('when both throw', () => {
+    function ctrl(): string {
+      throw new Error('Kaos!');
+    }
+
+    function candi(): string {
+      throw new Error("Candy I can't let you go");
+    }
+
+    it('should throw', () => {
+      const experiment = scientist.experiment({
+        name: 'bothrow1',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      expect(() => experiment()).toThrowError('Kaos!');
+    });
+
+    it('should publish results', () => {
+      const experiment = scientist.experiment({
+        name: 'bothrow2',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      try {
+        experiment();
+      } catch {
+        // swallow error
+      }
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const results = publishMock.mock.calls[0][0];
+      expect(results.experimentName).toBe('bothrow2');
+      expect(results.experimentArguments).toEqual([]);
+      expect(results.controlResult).toBeUndefined();
+      expect(results.candidateResult).toBeUndefined();
+      expect(results.controlError).toBeDefined();
+      expect(results.controlError.message).toBe('Kaos!');
+      expect(results.candidateError).toBeDefined();
+      expect(results.candidateError.message).toBe("Candy I can't let you go");
+    });
+  });
+
   describe('when enabled option is specified', () => {
     const candidateMock: jest.Mock<string, [string]> = jest.fn<
       string,
