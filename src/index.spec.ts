@@ -54,6 +54,10 @@ describe('experiment', () => {
       expect(results.candidateResult).toBe(3);
       expect(results.controlError).toBeUndefined();
       expect(results.candidateError).toBeUndefined();
+      expect(results.controlTimeMs).toBeDefined();
+      expect(results.controlTimeMs).toBeGreaterThan(0);
+      expect(results.candidateTimeMs).toBeDefined();
+      expect(results.candidateTimeMs).toBeGreaterThan(0);
     });
   });
 
