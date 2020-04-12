@@ -643,6 +643,10 @@ describe('experimentAsync', () => {
       expect(results.candidateResult).toBe(3);
       expect(results.controlError).toBeUndefined();
       expect(results.candidateError).toBeUndefined();
+      expect(results.controlTimeMs).toBeDefined();
+      expect(results.controlTimeMs).toBeGreaterThan(0);
+      expect(results.candidateTimeMs).toBeDefined();
+      expect(results.candidateTimeMs).toBeGreaterThan(0);
     });
   });
 
@@ -701,6 +705,10 @@ describe('experimentAsync', () => {
       expect(results.candidateResult).toBe('C');
       expect(results.controlError).toBeUndefined();
       expect(results.candidateError).toBeUndefined();
+      expect(results.controlTimeMs).toBeDefined();
+      expect(results.controlTimeMs).toBeGreaterThan(0);
+      expect(results.candidateTimeMs).toBeDefined();
+      expect(results.candidateTimeMs).toBeGreaterThan(0);
     });
   });
 
@@ -759,6 +767,9 @@ describe('experimentAsync', () => {
       expect(results.controlError).toBeUndefined();
       expect(results.candidateError).toBeDefined();
       expect(results.candidateError.message).toBe("Candy I can't let you go");
+      expect(results.controlTimeMs).toBeDefined();
+      expect(results.controlTimeMs).toBeGreaterThan(0);
+      expect(results.candidateTimeMs).toBeUndefined();
     });
   });
 
@@ -819,6 +830,9 @@ describe('experimentAsync', () => {
       expect(results.controlError).toBeDefined();
       expect(results.controlError.message).toBe('Kaos!');
       expect(results.candidateError).toBeUndefined();
+      expect(results.controlTimeMs).toBeUndefined();
+      expect(results.candidateTimeMs).toBeDefined();
+      expect(results.candidateTimeMs).toBeGreaterThan(0);
     });
   });
 
@@ -879,6 +893,8 @@ describe('experimentAsync', () => {
       expect(results.controlError.message).toBe('Kaos!');
       expect(results.candidateError).toBeDefined();
       expect(results.candidateError.message).toBe("Candy I can't let you go");
+      expect(results.controlTimeMs).toBeUndefined();
+      expect(results.candidateTimeMs).toBeUndefined();
     });
   });
 
@@ -1066,6 +1082,31 @@ describe('experimentAsync', () => {
       const elapsedMs = Number((end - start) / BigInt(nsPerMs));
 
       expect(elapsedMs).toBeLessThan(msPerFunction + allowedOverhead);
+    });
+
+    it('should publish individual timings', async () => {
+      const allowedVarianceMs = 125;
+      const minMs = msPerFunction - allowedVarianceMs;
+      const maxMs = msPerFunction + allowedVarianceMs;
+      const experiment = scientist.experimentAsync({
+        name: 'async parallel2',
+        control: ctrl,
+        candidate: candi,
+        options: {
+          publish: publishMock
+        }
+      });
+
+      await experiment();
+
+      expect(publishMock.mock.calls.length).toBe(1);
+      const results = publishMock.mock.calls[0][0];
+      expect(results.controlTimeMs).toBeDefined();
+      expect(results.controlTimeMs).toBeGreaterThan(minMs);
+      expect(results.controlTimeMs).toBeLessThan(maxMs);
+      expect(results.candidateTimeMs).toBeDefined();
+      expect(results.candidateTimeMs).toBeGreaterThan(minMs);
+      expect(results.candidateTimeMs).toBeLessThan(maxMs);
     });
   });
 });

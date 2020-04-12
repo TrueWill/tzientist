@@ -118,6 +118,17 @@ export function experiment<TParams extends any[], TResult>({
   };
 }
 
+async function executeAndTime<TParams extends any[], TResult>(
+  controlOrCandidate: ExperimentAsyncFunction<TParams, TResult>,
+  args: TParams
+): Promise<[TResult, number]> {
+  // Not using bigint version of hrtime for Node 8 compatibility
+  const startTime = process.hrtime();
+  const result = await controlOrCandidate(...args);
+  const timeMs = hrtimeToMs(process.hrtime(startTime));
+  return [result, timeMs];
+}
+
 /**
  * A factory that creates an asynchronous experiment function.
  *
@@ -145,6 +156,8 @@ export function experimentAsync<TParams extends any[], TResult>({
     let candidateResult: TResult | undefined;
     let controlError: any;
     let candidateError: any;
+    let controlTimeMs: number | undefined;
+    let candidateTimeMs: number | undefined;
     const isEnabled: boolean = !options.enabled || options.enabled(...args);
 
     function publishResults(): void {
@@ -155,21 +168,26 @@ export function experimentAsync<TParams extends any[], TResult>({
           controlResult,
           candidateResult,
           controlError,
-          candidateError
+          candidateError,
+          controlTimeMs,
+          candidateTimeMs
         });
       }
     }
 
     if (isEnabled) {
       // Run in parallel
-      [candidateResult, controlResult] = await Promise.all([
-        candidate(...args).catch((e) => {
+      [
+        [candidateResult, candidateTimeMs],
+        [controlResult, controlTimeMs]
+      ] = await Promise.all([
+        executeAndTime(candidate, args).catch((e) => {
           candidateError = e;
-          return undefined;
+          return [undefined, undefined];
         }),
-        control(...args).catch((e) => {
+        executeAndTime(control, args).catch((e) => {
           controlError = e;
-          return undefined;
+          return [undefined, undefined];
         })
       ]);
     } else {
