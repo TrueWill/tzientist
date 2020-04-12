@@ -114,6 +114,10 @@ The `control` and the `candidate` will be run in parallel (that is, concurrently
 
 If your functions use callbacks, look at wrapping them with [util.promisify](https://nodejs.org/api/util.html#util_util_promisify_original).
 
+### Timing / profiling
+
+Published results now include timings for both the control and the candidate. Timings are in milliseconds (ms). Note that other queued tasks could affect asynchronous timings, at least in theory.
+
 ## FAQ
 
 Q. Why would I use this library?
@@ -159,10 +163,6 @@ Q. Why doesn't Tzientist randomize the order in which the control and the candid
 
 A. Because those functions should not have side effects.
 
-## To do
-
-- Timer support.
-
 ## Why
 
 GitHub's [Scientist](https://github.com/github/scientist) Ruby library is a brilliant concept. Unfortunately the Node.js alternatives aren't very TypeScript-friendly.
@@ -183,7 +183,7 @@ Feature parity with Scientist is _not_ a goal.
 ### Technology stack
 
 - TypeScript v3.8
-- Node v12 (should work on v8.17.0 or higher)
+- Node v12 (should work on v8.17.0 or higher, but tests require v12)
 - npm v6 (I like yarn, but not everyone does)
 - [Prettier](https://prettier.io/)
 - ESLint

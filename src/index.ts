@@ -14,11 +14,20 @@ export interface Results<TParams extends any[], TResult> {
   candidateResult?: TResult;
   controlError?: any;
   candidateError?: any;
+  controlTimeMs?: number;
+  candidateTimeMs?: number;
 }
 
 export interface Options<TParams extends any[], TResult> {
   publish?: (results: Results<TParams, TResult>) => void;
   enabled?: (...args: TParams) => boolean;
+}
+
+function hrtimeToMs(hrtime: [number, number]): number {
+  const MS_PER_SEC = 1000;
+  const NS_PER_MS = 1e6;
+  const [seconds, nanoseconds] = hrtime;
+  return seconds * MS_PER_SEC + nanoseconds / NS_PER_MS;
 }
 
 function defaultPublish<TParams extends any[], TResult>(
@@ -64,6 +73,8 @@ export function experiment<TParams extends any[], TResult>({
     let candidateResult: TResult | undefined;
     let controlError: any;
     let candidateError: any;
+    let controlTimeMs: number;
+    let candidateTimeMs: number;
     const isEnabled: boolean = !options.enabled || options.enabled(...args);
 
     function publishResults(): void {
@@ -74,21 +85,28 @@ export function experiment<TParams extends any[], TResult>({
           controlResult,
           candidateResult,
           controlError,
-          candidateError
+          candidateError,
+          controlTimeMs,
+          candidateTimeMs
         });
       }
     }
 
     if (isEnabled) {
       try {
+        // Not using bigint version of hrtime for Node 8 compatibility
+        const candidateStartTime = process.hrtime();
         candidateResult = candidate(...args);
+        candidateTimeMs = hrtimeToMs(process.hrtime(candidateStartTime));
       } catch (e) {
         candidateError = e;
       }
     }
 
     try {
+      const controlStartTime = process.hrtime();
       controlResult = control(...args);
+      controlTimeMs = hrtimeToMs(process.hrtime(controlStartTime));
     } catch (e) {
       controlError = e;
       publishResults();
@@ -98,6 +116,17 @@ export function experiment<TParams extends any[], TResult>({
     publishResults();
     return controlResult;
   };
+}
+
+async function executeAndTime<TParams extends any[], TResult>(
+  controlOrCandidate: ExperimentAsyncFunction<TParams, TResult>,
+  args: TParams
+): Promise<[TResult, number]> {
+  // Not using bigint version of hrtime for Node 8 compatibility
+  const startTime = process.hrtime();
+  const result = await controlOrCandidate(...args);
+  const timeMs = hrtimeToMs(process.hrtime(startTime));
+  return [result, timeMs];
 }
 
 /**
@@ -127,6 +156,8 @@ export function experimentAsync<TParams extends any[], TResult>({
     let candidateResult: TResult | undefined;
     let controlError: any;
     let candidateError: any;
+    let controlTimeMs: number | undefined;
+    let candidateTimeMs: number | undefined;
     const isEnabled: boolean = !options.enabled || options.enabled(...args);
 
     function publishResults(): void {
@@ -137,21 +168,26 @@ export function experimentAsync<TParams extends any[], TResult>({
           controlResult,
           candidateResult,
           controlError,
-          candidateError
+          candidateError,
+          controlTimeMs,
+          candidateTimeMs
         });
       }
     }
 
     if (isEnabled) {
       // Run in parallel
-      [candidateResult, controlResult] = await Promise.all([
-        candidate(...args).catch((e) => {
+      [
+        [candidateResult, candidateTimeMs],
+        [controlResult, controlTimeMs]
+      ] = await Promise.all([
+        executeAndTime(candidate, args).catch((e) => {
           candidateError = e;
-          return undefined;
+          return [undefined, undefined];
         }),
-        control(...args).catch((e) => {
+        executeAndTime(control, args).catch((e) => {
           controlError = e;
-          return undefined;
+          return [undefined, undefined];
         })
       ]);
     } else {
