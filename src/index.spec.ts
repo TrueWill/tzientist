@@ -105,6 +105,10 @@ describe('experiment', () => {
       expect(results.candidateResult).toBe('C');
       expect(results.controlError).toBeUndefined();
       expect(results.candidateError).toBeUndefined();
+      expect(results.controlTimeMs).toBeDefined();
+      expect(results.controlTimeMs).toBeGreaterThan(0);
+      expect(results.candidateTimeMs).toBeDefined();
+      expect(results.candidateTimeMs).toBeGreaterThan(0);
     });
   });
 
@@ -153,6 +157,9 @@ describe('experiment', () => {
       expect(results.controlError).toBeUndefined();
       expect(results.candidateError).toBeDefined();
       expect(results.candidateError.message).toBe("Candy I can't let you go");
+      expect(results.controlTimeMs).toBeDefined();
+      expect(results.controlTimeMs).toBeGreaterThan(0);
+      expect(results.candidateTimeMs).toBeUndefined();
     });
   });
 
@@ -203,6 +210,9 @@ describe('experiment', () => {
       expect(results.controlError).toBeDefined();
       expect(results.controlError.message).toBe('Kaos!');
       expect(results.candidateError).toBeUndefined();
+      expect(results.controlTimeMs).toBeUndefined();
+      expect(results.candidateTimeMs).toBeDefined();
+      expect(results.candidateTimeMs).toBeGreaterThan(0);
     });
   });
 
@@ -254,6 +264,8 @@ describe('experiment', () => {
       expect(results.controlError.message).toBe('Kaos!');
       expect(results.candidateError).toBeDefined();
       expect(results.candidateError.message).toBe("Candy I can't let you go");
+      expect(results.controlTimeMs).toBeUndefined();
+      expect(results.candidateTimeMs).toBeUndefined();
     });
   });
 
