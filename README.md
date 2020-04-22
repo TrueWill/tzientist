@@ -112,6 +112,8 @@ const result: number = await experiment(1, 2);
 
 The `control` and the `candidate` will be run in parallel (that is, concurrently). Options are the same as for a normal `experiment`.
 
+Note that Node applications run on a single thread, so if the functions are CPU-intensive then the experiment may take significantly longer than just running the original code.
+
 If your functions use callbacks, look at wrapping them with [util.promisify](https://nodejs.org/api/util.html#util_util_promisify_original).
 
 ### Timing / profiling
