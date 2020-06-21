@@ -173,6 +173,12 @@ Q. What if the results always differ due to the data containing timestamps, GUID
 
 A. One technique is to match those with regular expressions and replace them with a placeholder before comparing.
 
+---
+
+Q. Will this work with [Deno](https://deno.land/)?
+
+A. No; instead, please check out [paleontologist](https://github.com/TrueWill/paleontologist).
+
 ## Why
 
 GitHub's [Scientist](https://github.com/github/scientist) Ruby library is a brilliant concept. Unfortunately the Node.js alternatives aren't very TypeScript-friendly.
