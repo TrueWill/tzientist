@@ -160,6 +160,7 @@ A.
 
 - Both `publish` and `enabled` should be fast
 - Both `publish` and `enabled` should **not** throw (they should catch any errors)
+- Both `publish` and `enabled` should **not** mutate the results (particularly the `controlResult`). Tzientist does not do any deep cloning on its own. If you want to alter the results for a custom compare, consider using something like [Lodash's](https://lodash.com/) `cloneDeep` first.
 
 ---
 
