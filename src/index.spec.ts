@@ -1,10 +1,8 @@
 import * as scientist from './index';
 
 describe('experiment', () => {
-  const publishMock: jest.Mock<void, [scientist.Results<any[], any>]> = jest.fn<
-    void,
-    [scientist.Results<any[], any>]
-  >();
+  const publishMock: jest.Mock<void, [scientist.Results<any[], any>]> =
+    jest.fn<void, [scientist.Results<any[], any>]>();
 
   afterEach(() => {
     publishMock.mockClear();
@@ -270,10 +268,8 @@ describe('experiment', () => {
   });
 
   describe('when enabled option is specified', () => {
-    const candidateMock: jest.Mock<string, [string]> = jest.fn<
-      string,
-      [string]
-    >();
+    const candidateMock: jest.Mock<string, [string]> =
+      jest.fn<string, [string]>();
 
     afterEach(() => {
       candidateMock.mockClear();
@@ -651,10 +647,8 @@ describe('experimentAsync', () => {
   });
 
   describe('when function results differ', () => {
-    const publishMock: jest.Mock<
-      void,
-      [scientist.Results<[string], string>]
-    > = jest.fn<void, [scientist.Results<[string], string>]>();
+    const publishMock: jest.Mock<void, [scientist.Results<[string], string>]> =
+      jest.fn<void, [scientist.Results<[string], string>]>();
 
     afterEach(() => {
       publishMock.mockClear();
@@ -713,10 +707,8 @@ describe('experimentAsync', () => {
   });
 
   describe('when candidate rejects', () => {
-    const publishMock: jest.Mock<
-      void,
-      [scientist.Results<[], string>]
-    > = jest.fn<void, [scientist.Results<[], string>]>();
+    const publishMock: jest.Mock<void, [scientist.Results<[], string>]> =
+      jest.fn<void, [scientist.Results<[], string>]>();
 
     afterEach(() => {
       publishMock.mockClear();
@@ -774,10 +766,8 @@ describe('experimentAsync', () => {
   });
 
   describe('when control rejects', () => {
-    const publishMock: jest.Mock<
-      void,
-      [scientist.Results<[], string>]
-    > = jest.fn<void, [scientist.Results<[], string>]>();
+    const publishMock: jest.Mock<void, [scientist.Results<[], string>]> =
+      jest.fn<void, [scientist.Results<[], string>]>();
 
     afterEach(() => {
       publishMock.mockClear();
@@ -837,10 +827,8 @@ describe('experimentAsync', () => {
   });
 
   describe('when both reject', () => {
-    const publishMock: jest.Mock<
-      void,
-      [scientist.Results<[], string>]
-    > = jest.fn<void, [scientist.Results<[], string>]>();
+    const publishMock: jest.Mock<void, [scientist.Results<[], string>]> =
+      jest.fn<void, [scientist.Results<[], string>]>();
 
     afterEach(() => {
       publishMock.mockClear();
@@ -899,15 +887,11 @@ describe('experimentAsync', () => {
   });
 
   describe('when enabled option is specified', () => {
-    const publishMock: jest.Mock<
-      void,
-      [scientist.Results<[string], string>]
-    > = jest.fn<void, [scientist.Results<[string], string>]>();
+    const publishMock: jest.Mock<void, [scientist.Results<[string], string>]> =
+      jest.fn<void, [scientist.Results<[string], string>]>();
 
-    const candidateMock: jest.Mock<Promise<string>, [string]> = jest.fn<
-      Promise<string>,
-      [string]
-    >();
+    const candidateMock: jest.Mock<Promise<string>, [string]> =
+      jest.fn<Promise<string>, [string]>();
 
     afterEach(() => {
       publishMock.mockClear();
@@ -1041,10 +1025,8 @@ describe('experimentAsync', () => {
   });
 
   describe('when functions are slow', () => {
-    const publishMock: jest.Mock<
-      void,
-      [scientist.Results<[], string>]
-    > = jest.fn<void, [scientist.Results<[], string>]>();
+    const publishMock: jest.Mock<void, [scientist.Results<[], string>]> =
+      jest.fn<void, [scientist.Results<[], string>]>();
 
     afterEach(() => {
       publishMock.mockClear();

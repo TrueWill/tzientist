@@ -2,10 +2,8 @@ export type ExperimentFunction<TParams extends any[], TResult> = (
   ...args: TParams
 ) => TResult;
 
-export type ExperimentAsyncFunction<
-  TParams extends any[],
-  TResult
-> = ExperimentFunction<TParams, Promise<TResult>>;
+export type ExperimentAsyncFunction<TParams extends any[], TResult> =
+  ExperimentFunction<TParams, Promise<TResult>>;
 
 export interface Results<TParams extends any[], TResult> {
   experimentName: string;
@@ -177,19 +175,17 @@ export function experimentAsync<TParams extends any[], TResult>({
 
     if (isEnabled) {
       // Run in parallel
-      [
-        [candidateResult, candidateTimeMs],
-        [controlResult, controlTimeMs]
-      ] = await Promise.all([
-        executeAndTime(candidate, args).catch((e) => {
-          candidateError = e;
-          return [undefined, undefined];
-        }),
-        executeAndTime(control, args).catch((e) => {
-          controlError = e;
-          return [undefined, undefined];
-        })
-      ]);
+      [[candidateResult, candidateTimeMs], [controlResult, controlTimeMs]] =
+        await Promise.all([
+          executeAndTime(candidate, args).catch((e) => {
+            candidateError = e;
+            return [undefined, undefined];
+          }),
+          executeAndTime(control, args).catch((e) => {
+            controlError = e;
+            return [undefined, undefined];
+          })
+        ]);
     } else {
       controlResult = await control(...args).catch((e) => {
         controlError = e;
