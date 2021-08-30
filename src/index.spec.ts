@@ -1,3 +1,9 @@
+import {performance} from 'perf_hooks'
+
+(global as any).perf_hooks = {
+  performance
+}
+
 import * as scientist from './index';
 
 describe('experiment', () => {
@@ -496,7 +502,7 @@ describe('experiment', () => {
 
     beforeEach(() => {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => { });
     });
 
     afterEach(() => {
