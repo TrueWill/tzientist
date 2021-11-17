@@ -2,8 +2,10 @@ export type ExperimentFunction<TParams extends any[], TResult> = (
   ...args: TParams
 ) => TResult;
 
-export type ExperimentAsyncFunction<TParams extends any[], TResult> =
-  ExperimentFunction<TParams, Promise<TResult>>;
+export type ExperimentAsyncFunction<
+  TParams extends any[],
+  TResult
+> = ExperimentFunction<TParams, Promise<TResult>>;
 
 export interface Results<TParams extends any[], TResult> {
   experimentName: string;

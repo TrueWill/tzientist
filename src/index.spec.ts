@@ -1,8 +1,10 @@
 import * as scientist from './index';
 
 describe('experiment', () => {
-  const publishMock: jest.Mock<void, [scientist.Results<any[], any>]> =
-    jest.fn<void, [scientist.Results<any[], any>]>();
+  const publishMock: jest.Mock<void, [scientist.Results<any[], any>]> = jest.fn<
+    void,
+    [scientist.Results<any[], any>]
+  >();
 
   afterEach(() => {
     publishMock.mockClear();
@@ -268,8 +270,10 @@ describe('experiment', () => {
   });
 
   describe('when enabled option is specified', () => {
-    const candidateMock: jest.Mock<string, [string]> =
-      jest.fn<string, [string]>();
+    const candidateMock: jest.Mock<string, [string]> = jest.fn<
+      string,
+      [string]
+    >();
 
     afterEach(() => {
       candidateMock.mockClear();
@@ -890,8 +894,10 @@ describe('experimentAsync', () => {
     const publishMock: jest.Mock<void, [scientist.Results<[string], string>]> =
       jest.fn<void, [scientist.Results<[string], string>]>();
 
-    const candidateMock: jest.Mock<Promise<string>, [string]> =
-      jest.fn<Promise<string>, [string]>();
+    const candidateMock: jest.Mock<Promise<string>, [string]> = jest.fn<
+      Promise<string>,
+      [string]
+    >();
 
     afterEach(() => {
       publishMock.mockClear();
