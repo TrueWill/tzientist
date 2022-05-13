@@ -15,7 +15,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "engines": {
-    "node": ">=8.17.0"
+    "node": ">=14"
   },
   "repository": {
     "type": "git",
