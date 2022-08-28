@@ -112,7 +112,7 @@ const experiment = scientist.experimentAsync({
 const result: number = await experiment(1, 2);
 ```
 
-The `control` and the `candidate` will be run in parallel (that is, concurrently). Options are the same as for a normal `experiment`.
+The `control` and the `candidate` will be run in parallel (that is, concurrently) by default. Options are the same as for a normal `experiment` with one exception - you can specify `inParallel: false` to run in serial (the candidate will run first).
 
 Note that Node applications run on a single thread, so if the functions are CPU-intensive then the experiment may take significantly longer than just running the original code.
 
@@ -222,6 +222,7 @@ Feature parity with Scientist is _not_ a goal.
 
 - GitHub and all contributors for [Scientist](https://github.com/github/scientist)
 - Microsoft and all contributors for TypeScript
+- @mathieug for his contribution to this project! (The `inParallel` option.) 😺
 - Rashauna, Dani, TC, Jon, and many others from Redox, Inc. for educating me about Scientist and TypeScript
   - Jon for his feedback
 - Titian Cernicova-Dragomir for a key [Stack Overflow answer](https://stackoverflow.com/a/60469374/161457) on types
