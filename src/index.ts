@@ -23,6 +23,18 @@ export interface Options<TParams extends any[], TResult> {
   enabled?: (...args: TParams) => boolean;
 }
 
+export type OptionsSync<TParams extends any[], TResult> = Options<
+  TParams,
+  TResult
+>;
+
+export type OptionsAsync<TParams extends any[], TResult> = Options<
+  TParams,
+  TResult
+> & {
+  inParallel?: boolean;
+};
+
 function hrtimeToMs(hrtime: [number, number]): number {
   const MS_PER_SEC = 1000;
   const NS_PER_MS = 1e6;
@@ -42,7 +54,7 @@ function defaultPublish<TParams extends any[], TResult>(
   }
 }
 
-const defaultOptions = {
+const defaultOptionsSync = {
   publish: defaultPublish
 };
 
@@ -59,12 +71,12 @@ export function experiment<TParams extends any[], TResult>({
   name,
   control,
   candidate,
-  options = defaultOptions
+  options = defaultOptionsSync
 }: {
   name: string;
   control: ExperimentFunction<TParams, TResult>;
   candidate: ExperimentFunction<TParams, TResult>;
-  options?: Options<TParams, TResult>;
+  options?: OptionsSync<TParams, TResult>;
 }): ExperimentFunction<TParams, TResult> {
   const publish = options.publish || defaultPublish;
 
@@ -129,6 +141,11 @@ async function executeAndTime<TParams extends any[], TResult>(
   return [result, timeMs];
 }
 
+const defaultOptionsAsync = {
+  ...defaultOptionsSync,
+  inParallel: true
+};
+
 /**
  * A factory that creates an asynchronous experiment function.
  *
@@ -142,14 +159,15 @@ export function experimentAsync<TParams extends any[], TResult>({
   name,
   control,
   candidate,
-  options = defaultOptions
+  options = defaultOptionsAsync
 }: {
   name: string;
   control: ExperimentAsyncFunction<TParams, TResult>;
   candidate: ExperimentAsyncFunction<TParams, TResult>;
-  options?: Options<TParams, TResult>;
+  options?: OptionsAsync<TParams, TResult>;
 }): ExperimentAsyncFunction<TParams, TResult> {
-  const publish = options.publish || defaultPublish;
+  const publish = options.publish ?? defaultOptionsAsync.publish;
+  const inParallel = options.inParallel ?? defaultOptionsAsync.inParallel;
 
   return async (...args): Promise<TResult> => {
     let controlResult: TResult | undefined;
@@ -176,18 +194,20 @@ export function experimentAsync<TParams extends any[], TResult>({
     }
 
     if (isEnabled) {
-      // Run in parallel
+      const runFunctions = getRunFunctions<TResult>(inParallel);
       [[candidateResult, candidateTimeMs], [controlResult, controlTimeMs]] =
-        await Promise.all([
-          executeAndTime(candidate, args).catch((e) => {
-            candidateError = e;
-            return [undefined, undefined];
-          }),
-          executeAndTime(control, args).catch((e) => {
-            controlError = e;
-            return [undefined, undefined];
-          })
-        ]);
+        await runFunctions(
+          () =>
+            executeAndTime(candidate, args).catch((e) => {
+              candidateError = e;
+              return [undefined, undefined];
+            }),
+          () =>
+            executeAndTime(control, args).catch((e) => {
+              controlError = e;
+              return [undefined, undefined];
+            })
+        );
     } else {
       controlResult = await control(...args).catch((e) => {
         controlError = e;
@@ -203,5 +223,17 @@ export function experimentAsync<TParams extends any[], TResult>({
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return controlResult!;
+  };
+}
+
+function getRunFunctions<TResult>(inParallel: boolean) {
+  return async (
+    function1: () => Promise<[TResult, number] | [undefined, undefined]>,
+    function2: () => Promise<[TResult, number] | [undefined, undefined]>
+  ) => {
+    if (inParallel) {
+      return Promise.all([function1(), function2()]);
+    }
+    return [await function1(), await function2()];
   };
 }
