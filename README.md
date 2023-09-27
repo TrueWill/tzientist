@@ -199,9 +199,9 @@ Feature parity with Scientist is _not_ a goal.
 
 ### Technology stack
 
-- TypeScript v4.6
-- Node v16 (should work on v14 or higher, but tests require v16+)
-- npm v8 (I like yarn, but not everyone does)
+- TypeScript v5.2
+- Node v18 (_may_ work on older versions)
+- npm v10 (I like yarn, but not everyone does)
 - [Prettier](https://prettier.io/)
 - ESLint
 - Jest
@@ -210,7 +210,7 @@ Feature parity with Scientist is _not_ a goal.
 
 - TypeScript strict option
 - No classes
-- Prettier 2 with single quotes and no trailing commas
+- Prettier 3 with single quotes and no trailing commas
 - No ESLint warnings/errors
 - All tests pass
 - No dependencies (other than devDependencies)
@@ -229,6 +229,7 @@ Feature parity with Scientist is _not_ a goal.
 - The rest of the TypeScript community (particularly the maintainers of [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped))
 - Michal Zalecki for the article [Creating a TypeScript library with a minimal setup](https://michalzalecki.com/creating-typescript-library-with-a-minimal-setup/)
 - Linus Unnebäck for a [Stack Overflow answer](https://stackoverflow.com/a/50466512/161457)
+- Higor Ramos for contributing
 - All of the creators, contributors, and maintainers of the open source used here
 - Sam Newman for discussing the Parallel Run pattern in the book [Monolith to Microservices](https://samnewman.io/books/monolith-to-microservices/)
 - OpenJS Foundation for Node.js
