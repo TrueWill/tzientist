@@ -182,7 +182,7 @@ describe('experiment', () => {
         }
       });
 
-      expect(() => experiment()).toThrowError('Kaos!');
+      expect(() => experiment()).toThrow('Kaos!');
     });
 
     it('should publish results', () => {
@@ -235,7 +235,7 @@ describe('experiment', () => {
         }
       });
 
-      expect(() => experiment()).toThrowError('Kaos!');
+      expect(() => experiment()).toThrow('Kaos!');
     });
 
     it('should publish results', () => {
@@ -441,7 +441,7 @@ describe('experiment', () => {
             }
           });
 
-          expect(() => experiment('C')).toThrowError('Kaos!');
+          expect(() => experiment('C')).toThrow('Kaos!');
         });
 
         it('should not run candidate', () => {
@@ -499,7 +499,6 @@ describe('experiment', () => {
     let consoleSpy: jest.SpyInstance;
 
     beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     });
 

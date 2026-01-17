@@ -221,7 +221,6 @@ export function experimentAsync<TParams extends any[], TResult>({
       throw controlError;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return controlResult!;
   };
 }
