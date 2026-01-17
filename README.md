@@ -199,9 +199,9 @@ Feature parity with Scientist is _not_ a goal.
 
 ### Technology stack
 
-- TypeScript v5.2
-- Node v18 (_may_ work on older versions)
-- npm v10 (I like yarn, but not everyone does)
+- TypeScript v5.9.3
+- Node v24 (_may_ work on older versions)
+- npm v11 (I like yarn, but not everyone does)
 - [Prettier](https://prettier.io/)
 - ESLint
 - Jest
