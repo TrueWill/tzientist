@@ -580,6 +580,82 @@ describe('experiment', () => {
         expect(candidateMock.mock.calls.length).toBe(0);
       });
     });
+
+    describe('when control throws but candidate does not', () => {
+      function ctrlThrows(): number {
+        throw new Error('Control error');
+      }
+
+      function candiSucceeds(): number {
+        return 42;
+      }
+
+      it('should warn about difference', () => {
+        const experiment = scientist.experiment({
+          name: 'controlThrowsOnly',
+          control: ctrlThrows,
+          candidate: candiSucceeds
+        });
+
+        expect(() => experiment()).toThrow('Control error');
+
+        expect(consoleSpy.mock.calls.length).toBe(1);
+        expect(consoleSpy.mock.calls[0][0]).toBe(
+          'Experiment controlThrowsOnly: difference found'
+        );
+      });
+    });
+
+    describe('when control throws and candidate returns undefined', () => {
+      function ctrlThrows(): undefined {
+        throw new Error('Control error');
+      }
+
+      function candiReturnsUndefined(): undefined {
+        return undefined;
+      }
+
+      it('should warn about difference due to control error', () => {
+        const experiment = scientist.experiment({
+          name: 'controlErrorOnly',
+          control: ctrlThrows,
+          candidate: candiReturnsUndefined
+        });
+
+        expect(() => experiment()).toThrow('Control error');
+
+        expect(consoleSpy.mock.calls.length).toBe(1);
+        expect(consoleSpy.mock.calls[0][0]).toBe(
+          'Experiment controlErrorOnly: difference found'
+        );
+      });
+    });
+
+    describe('when candidate throws and control returns undefined', () => {
+      function ctrlReturnsUndefined(): undefined {
+        return undefined;
+      }
+
+      function candiThrows(): undefined {
+        throw new Error('Candidate error');
+      }
+
+      it('should warn about difference due to candidate error', () => {
+        const experiment = scientist.experiment({
+          name: 'candidateErrorOnly',
+          control: ctrlReturnsUndefined,
+          candidate: candiThrows
+        });
+
+        const result = experiment();
+
+        expect(result).toBeUndefined();
+        expect(consoleSpy.mock.calls.length).toBe(1);
+        expect(consoleSpy.mock.calls[0][0]).toBe(
+          'Experiment candidateErrorOnly: difference found'
+        );
+      });
+    });
   });
 });
 
@@ -1129,4 +1205,122 @@ describe('experimentAsync', () => {
       });
     }
   );
+
+  describe('when default options are used', () => {
+    async function ctrl(): Promise<number> {
+      return 1;
+    }
+
+    async function candi(): Promise<number> {
+      return 2;
+    }
+
+    let consoleSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    describe('when no options are specified', () => {
+      it('should use sensible defaults', async () => {
+        const experiment = scientist.experimentAsync({
+          name: 'asyncNo1',
+          control: ctrl,
+          candidate: candi
+        });
+
+        await experiment();
+
+        expect(consoleSpy.mock.calls.length).toBe(1);
+        expect(consoleSpy.mock.calls[0][0]).toBe(
+          'Experiment asyncNo1: difference found'
+        );
+      });
+    });
+
+    describe('when only inParallel option is specified', () => {
+      it('should use default publish', async () => {
+        const experiment = scientist.experimentAsync({
+          name: 'asyncOpt1',
+          control: ctrl,
+          candidate: candi,
+          options: {
+            inParallel: false
+          }
+        });
+
+        await experiment();
+
+        expect(consoleSpy.mock.calls.length).toBe(1);
+        expect(consoleSpy.mock.calls[0][0]).toBe(
+          'Experiment asyncOpt1: difference found'
+        );
+      });
+    });
+  });
+
+  describe('when enabled option returns true', () => {
+    const publishMock: jest.Mock<
+      void,
+      [scientist.Results<[string], string>]
+    > = jest.fn<void, [scientist.Results<[string], string>]>();
+
+    const candidateMock: jest.Mock<Promise<string>, [string]> = jest.fn<
+      Promise<string>,
+      [string]
+    >();
+
+    afterEach(() => {
+      publishMock.mockClear();
+      candidateMock.mockClear();
+    });
+
+    async function ctrl(s: string): Promise<string> {
+      return `Ctrl+${s}`;
+    }
+
+    function enabled(): boolean {
+      return true;
+    }
+
+    it('should run candidate', async () => {
+      candidateMock.mockResolvedValue('mocked');
+
+      const experiment = scientist.experimentAsync({
+        name: 'async enabled1',
+        control: ctrl,
+        candidate: candidateMock,
+        options: {
+          publish: publishMock,
+          enabled
+        }
+      });
+
+      await experiment('C');
+
+      expect(candidateMock.mock.calls.length).toBe(1);
+    });
+
+    it('should publish results', async () => {
+      candidateMock.mockResolvedValue('mocked');
+
+      const experiment = scientist.experimentAsync({
+        name: 'async enabled2',
+        control: ctrl,
+        candidate: candidateMock,
+        options: {
+          publish: publishMock,
+          enabled
+        }
+      });
+
+      await experiment('C');
+
+      expect(publishMock.mock.calls.length).toBe(1);
+    });
+  });
 });
