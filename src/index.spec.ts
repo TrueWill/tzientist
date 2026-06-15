@@ -1264,10 +1264,8 @@ describe('experimentAsync', () => {
   });
 
   describe('when enabled option returns true', () => {
-    const publishMock: jest.Mock<
-      void,
-      [scientist.Results<[string], string>]
-    > = jest.fn<void, [scientist.Results<[string], string>]>();
+    const publishMock: jest.Mock<void, [scientist.Results<[string], string>]> =
+      jest.fn<void, [scientist.Results<[string], string>]>();
 
     const candidateMock: jest.Mock<Promise<string>, [string]> = jest.fn<
       Promise<string>,
