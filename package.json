@@ -33,6 +33,14 @@
     "url": "https://github.com/TrueWill/tzientist/issues"
   },
   "homepage": "https://github.com/TrueWill/tzientist#tzientist",
+  "overrides": {
+    "test-exclude": {
+      "minimatch": "^10.2.5"
+    },
+    "glob": {
+      "minimatch": "^10.2.5"
+    }
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
